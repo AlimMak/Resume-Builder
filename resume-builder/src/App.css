@@ -11,6 +11,11 @@ form {
   margin-bottom: 20px;
 }
 
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
 label {
   display: block;
   margin-bottom: 5px;
@@ -39,12 +44,39 @@ button {
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 button:hover {
   background-color: #c82333;
 }
 
+.back-button {
+  background-color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+}
+
 input[type="checkbox"] {
   margin-right: 8px;
+}
+
+.error {
+  border-color: #dc3545;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+.success-message {
+  color: #28a745;
+  margin-top: 10px;
+  font-weight: bold;
 }

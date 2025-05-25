@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-function PersonalInfoForm(){
+function PersonalInfoForm({ initialData, onSubmit }){
     const [inputs, setInputs] = useState({
         FirstName: '',
         LastName: '',
@@ -14,6 +14,13 @@ function PersonalInfoForm(){
     });
 
     const [isSubmitted, setIsSubmitted] = useState(false);
+
+    // Initialize form with initialData if provided
+    useEffect(() => {
+        if (initialData) {
+            setInputs(initialData);
+        }
+    }, [initialData]);
 
     const validateInputs = () => {
         let isValid = true;
@@ -71,7 +78,7 @@ function PersonalInfoForm(){
         setIsSubmitted(true);
 
         if (validateInputs()) {
-            console.log('Form submitted successfully:', inputs);
+            onSubmit(inputs);
         } else {
             console.log('Form has errors');
         }
@@ -79,22 +86,23 @@ function PersonalInfoForm(){
 
     return (
         <form onSubmit={handleSubmit}>
+            <h2>Personal Information</h2>
             <div>
-                <input type="text" name="FirstName" value={inputs.FirstName} onChange={handleInputChange} placeholder="Enter First Name" className={errors.FirstName ? 'error' : ''}/>
-                {errors.FirstName && <div className="error-message">{errors.FirstName}</div>}
+                <input type="text" name="FirstName" value={inputs.FirstName} onChange={handleInputChange} placeholder="Enter First Name"/>
+                {errors.FirstName && <div>{errors.FirstName}</div>}
             </div> 
             <div>
-                <input type="text" name="LastName" value={inputs.LastName} onChange={handleInputChange} placeholder="Enter Last Name" className={errors.LastName ? 'error' : ''}/>
-                {errors.LastName && <div className="error-message">{errors.LastName}</div>}
+                <input type="text" name="LastName" value={inputs.LastName} onChange={handleInputChange} placeholder="Enter Last Name"/>
+                {errors.LastName && <div>{errors.LastName}</div>}
             </div> 
             <div>
-                <input type="text" name="Description" value={inputs.Description} onChange={handleInputChange} placeholder="Enter Description" className={errors.Description ? 'error' : ''}/>
-                {errors.Description && <div className="error-message">{errors.Description}</div>}
+                <input type="text" name="Description" value={inputs.Description} onChange={handleInputChange} placeholder="Enter Description"/>
+                {errors.Description && <div>{errors.Description}</div>}
             </div>
-            <button type="submit">Submit</button> 
+            <button type="submit">Next: Work Experience</button> 
 
             {isSubmitted && Object.values(errors).every(err => !err) &&(
-                <div className="success-message">Form submitted successfully!</div>
+                <div>Form submitted successfully!</div>
             )}
         </form>
     ); 
