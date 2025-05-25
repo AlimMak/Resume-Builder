@@ -2,6 +2,7 @@ import { useState } from 'react'
 import PersonalInfoForm from './components/PersonalInfoForm'
 import ExperienceSection from './components/ExperienceSection'
 import EducationForm from './components/EducationForm'
+import ProjectsForm from './components/ProjectsForm'
 import FormNavigator from './components/FormNavigator'
 
 function App() {
@@ -13,7 +14,8 @@ function App() {
       Description: ''
     },
     education: [],
-    experience: []
+    experience: [],
+    projects: []
   });
 
   const handlePersonalInfoSubmit = (data) => {
@@ -30,6 +32,14 @@ function App() {
       education: data
     }));
     setCurrentStep(3);
+  };
+
+  const handleExperienceSubmit = (data) => {
+    setFormData(prev => ({
+      ...prev,
+      experience: data
+    }));
+    setCurrentStep(4);
   };
 
   const handleBack = () => {
@@ -50,7 +60,24 @@ function App() {
           onSubmit={handleEducationSubmit}
         />
       )}
-      {currentStep === 3 && <ExperienceSection />}
+      {currentStep === 3 && (
+        <ExperienceSection 
+          initialData={formData.experience}
+          onSubmit={handleExperienceSubmit}
+        />
+      )}
+      {currentStep === 4 && (
+        <ProjectsForm 
+          initialData={formData.projects}
+          onSubmit={(data) => {
+            setFormData(prev => ({
+              ...prev,
+              projects: data
+            }));
+            // TODO: Add next step or final submission
+          }}
+        />
+      )}
     </FormNavigator>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ExperienceForm from './ExperienceForm';
 
 // Same initial structure as before
@@ -16,11 +16,18 @@ const initialExperience = {
 };
 
 // This component manages ALL job experiences
-function ExperienceSection() {
+function ExperienceSection({ initialData, onSubmit }) {
   // State stores an array of experiences
   const [experiences, setExperiences] = useState([
     { ...initialExperience, id: '1' } // Start with one empty experience
   ]);
+
+  // Initialize form with initialData if provided
+  useEffect(() => {
+    if (initialData && initialData.length > 0) {
+      setExperiences(initialData);
+    }
+  }, [initialData]);
 
   // Updates a specific experience when its form changes
   const handleExperienceChange = (id, updatedExperience) => {
@@ -48,8 +55,14 @@ function ExperienceSection() {
     }
   };
 
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(experiences);
+  };
+
   return (
-    <div>
+    <form onSubmit={handleSubmit}>
       <h2>Work Experience</h2>
       
       {/* Render an ExperienceForm for each experience */}
@@ -66,7 +79,10 @@ function ExperienceSection() {
       <button type="button" onClick={addNewExperience}>
         Add Another Experience
       </button>
-    </div>
+
+      {/* Submit Button */}
+      <button type="submit">Next: Projects</button>
+    </form>
   );
 }
 
