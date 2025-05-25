@@ -3,6 +3,7 @@ import PersonalInfoForm from './components/PersonalInfoForm'
 import ExperienceSection from './components/ExperienceSection'
 import EducationForm from './components/EducationForm'
 import ProjectsForm from './components/ProjectsForm'
+import SkillsForm from './components/SkillsForm'
 import FormNavigator from './components/FormNavigator'
 
 function App() {
@@ -15,7 +16,8 @@ function App() {
     },
     education: [],
     experience: [],
-    projects: []
+    projects: [],
+    skills: []
   });
 
   const handlePersonalInfoSubmit = (data) => {
@@ -40,6 +42,14 @@ function App() {
       experience: data
     }));
     setCurrentStep(4);
+  };
+
+  const handleProjectsSubmit = (data) => {
+    setFormData(prev => ({
+      ...prev,
+      projects: data
+    }));
+    setCurrentStep(5);
   };
 
   const handleBack = () => {
@@ -69,10 +79,16 @@ function App() {
       {currentStep === 4 && (
         <ProjectsForm 
           initialData={formData.projects}
+          onSubmit={handleProjectsSubmit}
+        />
+      )}
+      {currentStep === 5 && (
+        <SkillsForm 
+          initialData={formData.skills}
           onSubmit={(data) => {
             setFormData(prev => ({
               ...prev,
-              projects: data
+              skills: data
             }));
             // TODO: Add next step or final submission
           }}
