@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import PersonalInfoForm from './components/PersonalInfoForm'
 import ExperienceSection from './components/ExperienceSection'
+import EducationForm from './components/EducationForm'
 import FormNavigator from './components/FormNavigator'
 
 function App() {
@@ -10,7 +11,9 @@ function App() {
       FirstName: '',
       LastName: '',
       Description: ''
-    }
+    },
+    education: [],
+    experience: []
   });
 
   const handlePersonalInfoSubmit = (data) => {
@@ -19,6 +22,14 @@ function App() {
       personalInfo: data
     }));
     setCurrentStep(2);
+  };
+
+  const handleEducationSubmit = (data) => {
+    setFormData(prev => ({
+      ...prev,
+      education: data
+    }));
+    setCurrentStep(3);
   };
 
   const handleBack = () => {
@@ -33,7 +44,13 @@ function App() {
           onSubmit={handlePersonalInfoSubmit}
         />
       )}
-      {currentStep === 2 && <ExperienceSection />}
+      {currentStep === 2 && (
+        <EducationForm 
+          initialData={formData.education}
+          onSubmit={handleEducationSubmit}
+        />
+      )}
+      {currentStep === 3 && <ExperienceSection />}
     </FormNavigator>
   );
 }
