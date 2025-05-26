@@ -71,7 +71,7 @@ function App() {
       ) : (
         // Show the final resume
         <ResumeDisplay 
-          onBack={handleBack} 
+          onGoHome={handleBack} 
           formData={formData}
         />
       )}

@@ -1,8 +1,22 @@
 import React from 'react';
 
-function ResumeDisplay({ formData, onBack }) {
+// Added isFormView, onBackStep, and onGoHome props for clearer navigation control
+function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
     return (
         <div>
+            {/* Navigation bar with Back and Home buttons */}
+            {/* Use a flex container to align Back left and Home right */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                {/* Show Back button only if in form view (step 6) */}
+                {isFormView && (
+                    // Use the onBackStep prop provided by ResumeForm
+                    <button onClick={onBackStep}>Back</button>
+                )}
+                {/* The Home button - always visible */}
+                {/* Use the onGoHome prop (App.jsx's handleBack) */}
+                <button onClick={onGoHome}>Home</button>
+            </div>
+
             {/* Main resume content */}
             <div>
                 {/* Personal Information section */}

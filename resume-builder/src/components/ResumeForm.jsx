@@ -117,7 +117,12 @@ function ResumeForm({ onBack, onDataUpdate, initialData }) {
         />
       )}
       {currentStep === 6 && (
-        <ResumeDisplay formData={formData} />
+        <ResumeDisplay 
+          formData={formData} 
+          isFormView={true}
+          onBackStep={handleBack}
+          onGoHome={onBack}
+        />
       )}
     </FormNavigator>
   );
