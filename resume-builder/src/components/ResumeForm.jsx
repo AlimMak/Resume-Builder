@@ -11,7 +11,6 @@ function ResumeForm({ onBack, onDataUpdate, initialData }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState(initialData);
 
-  // Update parent component when formData changes
   useEffect(() => {
     onDataUpdate(formData);
     localStorage.setItem('resumeData', JSON.stringify(formData));

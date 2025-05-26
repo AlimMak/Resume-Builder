@@ -3,13 +3,18 @@ import React from 'react';
 function ResumeDisplay({ formData, onBack }) {
     return (
         <div>
+            {/* Navigation bar with home button */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                 <button onClick={onBack}>Home</button>
             </div>
+
+            {/* Main resume content */}
             <div>
+                {/* Personal Information section */}
                 <h1>{formData.personalInfo.FirstName} {formData.personalInfo.LastName}</h1>
                 <p>{formData.personalInfo.Description}</p>
 
+                {/* Education section - shows all education entries */}
                 <h2>Education</h2>
                 {formData.education.map((edu, index) => (
                     <div key={index}>
@@ -20,6 +25,7 @@ function ResumeDisplay({ formData, onBack }) {
                     </div>
                 ))}
 
+                {/* Experience section - shows all work experience entries */}
                 <h2>Experience</h2>
                 {formData.experience.map((exp, index) => (
                     <div key={index}>
@@ -30,6 +36,7 @@ function ResumeDisplay({ formData, onBack }) {
                     </div>
                 ))}
 
+                {/* Projects section - shows all project entries */}
                 <h2>Projects</h2>
                 {formData.projects.map((project, index) => (
                     <div key={index}>
@@ -40,6 +47,7 @@ function ResumeDisplay({ formData, onBack }) {
                     </div>
                 ))}
 
+                {/* Skills section - shows all skills with commas between them */}
                 <h2>Skills</h2>
                 <div>
                     {formData.skills.map((skill, index) => (
