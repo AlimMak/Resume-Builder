@@ -3,11 +3,6 @@ import React from 'react';
 function ResumeDisplay({ formData, onBack }) {
     return (
         <div>
-            {/* Navigation bar with home button */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                <button onClick={onBack}>Home</button>
-            </div>
-
             {/* Main resume content */}
             <div>
                 {/* Personal Information section */}
