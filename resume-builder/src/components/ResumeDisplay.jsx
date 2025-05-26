@@ -32,7 +32,13 @@ function ResumeDisplay({ formData, onBack }) {
                         <h3>{exp.company}</h3>
                         <p>{exp.position}</p>
                         <p>{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</p>
-                        <p>{exp.description}</p>
+                        {/* Display bullet points for experience */}
+                        <ul>
+                            {/* Map over bullet points and display as list items if not empty */}
+                            {exp.bulletPoints.map((bulletPoint, bulletIndex) => (
+                                bulletPoint && <li key={bulletIndex}>{bulletPoint}</li>
+                            ))}
+                        </ul>
                     </div>
                 ))}
 
@@ -43,7 +49,13 @@ function ResumeDisplay({ formData, onBack }) {
                         <h3>{project.projectName}</h3>
                         <p>{project.role}</p>
                         <p>{project.startDate} - {project.isCurrent ? 'Present' : project.endDate}</p>
-                        <p>{project.description}</p>
+                        {/* Display bullet points for projects */}
+                        <ul>
+                            {/* Map over bullet points and display as list items if not empty */}
+                            {project.bulletPoints.map((bulletPoint, bulletIndex) => (
+                                bulletPoint && <li key={bulletIndex}>{bulletPoint}</li>
+                            ))}
+                        </ul>
                     </div>
                 ))}
 

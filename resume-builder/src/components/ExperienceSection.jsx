@@ -9,7 +9,7 @@ const initialExperience = {
   startDate: '',
   endDate: '',
   current: false,
-  description: '',
+  bulletPoints: [''],
   location: '',
   remote: false,
   employmentType: 'full-time'
@@ -58,6 +58,7 @@ function ExperienceSection({ initialData, onSubmit }) {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+    // console.log('ExperienceSection - Submitting experiences:', experiences);
     onSubmit(experiences);
   };
 

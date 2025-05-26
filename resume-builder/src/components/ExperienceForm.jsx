@@ -8,7 +8,7 @@ const initialExperience = {
   startDate: '',  // When the job started
   endDate: '',    // When the job ended
   current: false, // Is this a current job?
-  description: '',// Job responsibilities
+  bulletPoints: [''], // Changed from description to an array of bullet points
   location: '',   // Physical location
   remote: false,  // Is this a remote job?
   employmentType: 'full-time' // Job type
@@ -24,6 +24,33 @@ function ExperienceForm({ experience, onChange, onRemove }) {
     onChange({
       ...experience,         // Keep existing values
       [name]: type === 'checkbox' ? checked : value // Update changed field
+    });
+  };
+
+  // Handle changes to a specific bullet point
+  const handleBulletPointChange = (index, value) => {
+    const newBulletPoints = [...experience.bulletPoints];
+    newBulletPoints[index] = value;
+    onChange({
+      ...experience,
+      bulletPoints: newBulletPoints
+    });
+  };
+
+  // Add a new empty bullet point
+  const handleAddBulletPoint = () => {
+    onChange({
+      ...experience,
+      bulletPoints: [...experience.bulletPoints, '']
+    });
+  };
+
+  // Remove a bullet point by index
+  const handleRemoveBulletPoint = (index) => {
+    const newBulletPoints = experience.bulletPoints.filter((_, i) => i !== index);
+    onChange({
+      ...experience,
+      bulletPoints: newBulletPoints
     });
   };
 
@@ -132,16 +159,39 @@ function ExperienceForm({ experience, onChange, onRemove }) {
         </select>
       </div>
       
-      {/* Job Description Textarea */}
+      {/* Bullet Points Section */}
       <div>
-        <label>Position Description</label>
-        <textarea
-          name="description"
-          value={experience.description}
-          onChange={handleChange}
-          rows={4}
-          required
-        />
+        <label>Responsibilities & Achievements</label>
+        {/* Map over bulletPoints array to render input for each */}
+        {experience.bulletPoints.map((bulletPoint, index) => (
+          <div key={index} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+            <input
+              type="text"
+              value={bulletPoint}
+              onChange={(e) => handleBulletPointChange(index, e.target.value)}
+              placeholder="Enter a bullet point"
+              style={{ flex: 1 }}
+            />
+            {/* Show remove button only if there is more than one bullet point */}
+            {experience.bulletPoints.length > 1 && (
+              <button
+                type="button"
+                onClick={() => handleRemoveBulletPoint(index)}
+                style={{ padding: '4px 8px' }}
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        ))}
+        {/* Button to add a new bullet point */}
+        <button
+          type="button"
+          onClick={handleAddBulletPoint}
+          style={{ marginTop: '8px' }}
+        >
+          Add Bullet Point
+        </button>
       </div>
       
       {/* Remove Button */}

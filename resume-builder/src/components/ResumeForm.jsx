@@ -9,7 +9,25 @@ import FormNavigator from './FormNavigator'
 
 function ResumeForm({ onBack, onDataUpdate, initialData }) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState(initialData);
+  const [formData, setFormData] = useState(() => {
+    const initialProjects = initialData.projects || [];
+    const projectsWithBulletPoints = initialProjects.map(project => ({
+      ...project,
+      bulletPoints: project.bulletPoints || [''] // Default to [''] if missing or null/undefined
+    }));
+
+    return {
+      personalInfo: initialData.personalInfo || {
+        FirstName: '',
+        LastName: '',
+        Description: ''
+      },
+      education: initialData.education || [],
+      experience: initialData.experience || [],
+      projects: projectsWithBulletPoints,
+      skills: initialData.skills || []
+    };
+  });
 
   useEffect(() => {
     onDataUpdate(formData);
@@ -33,18 +51,24 @@ function ResumeForm({ onBack, onDataUpdate, initialData }) {
   };
 
   const handleExperienceSubmit = (data) => {
-    setFormData(prev => ({
-      ...prev,
-      experience: data
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        experience: data
+      };
+      return newData;
+    });
     setCurrentStep(4);
   };
 
   const handleProjectsSubmit = (data) => {
-    setFormData(prev => ({
-      ...prev,
-      projects: data
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        projects: data
+      };
+      return newData;
+    });
     setCurrentStep(5);
   };
 
