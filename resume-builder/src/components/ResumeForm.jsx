@@ -7,25 +7,26 @@ import SkillsForm from './SkillsForm'
 import ResumeDisplay from './ResumeDisplay'
 import FormNavigator from './FormNavigator'
 
-function ResumeForm({ onBack, onDataUpdate, initialData }) {
+function ResumeForm({ onBack: onGoHome, onDataUpdate, initialData }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState(() => {
-    const initialProjects = initialData.projects || [];
+    const initialProjects = initialData?.projects || [];
     const projectsWithBulletPoints = initialProjects.map(project => ({
       ...project,
       bulletPoints: project.bulletPoints || [''] // Default to [''] if missing or null/undefined
     }));
 
     return {
-      personalInfo: initialData.personalInfo || {
+      personalInfo: initialData?.personalInfo || {
         FirstName: '',
         LastName: '',
-        Description: ''
+        Description: '',
+        socials: [{ platform: '', url: '' }]
       },
-      education: initialData.education || [],
-      experience: initialData.experience || [],
+      education: initialData?.education || [],
+      experience: initialData?.experience || [],
       projects: projectsWithBulletPoints,
-      skills: initialData.skills || []
+      skills: initialData?.skills || []
     };
   });
 
@@ -85,7 +86,11 @@ function ResumeForm({ onBack, onDataUpdate, initialData }) {
   };
 
   return (
-    <FormNavigator currentStep={currentStep} onBack={handleBack}>
+    <FormNavigator 
+      currentStep={currentStep} 
+      onBack={handleBack}
+      onGoHome={onGoHome}
+    >
       {currentStep === 1 && (
         <PersonalInfoForm 
           initialData={formData.personalInfo}
@@ -121,7 +126,7 @@ function ResumeForm({ onBack, onDataUpdate, initialData }) {
           formData={formData} 
           isFormView={true}
           onBackStep={handleBack}
-          onGoHome={onBack}
+          onGoHome={onGoHome}
         />
       )}
     </FormNavigator>

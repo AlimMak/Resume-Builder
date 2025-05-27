@@ -6,16 +6,17 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
         <div>
             {/* Navigation bar with Back and Home buttons */}
             {/* Use a flex container to align Back left and Home right */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                {/* Show Back button only if in form view (step 6) */}
-                {isFormView && (
-                    // Use the onBackStep prop provided by ResumeForm
-                    <button onClick={onBackStep}>Back</button>
-                )}
-                {/* The Home button - always visible */}
-                {/* Use the onGoHome prop (App.jsx's handleBack) */}
-                <button onClick={onGoHome}>Home</button>
-            </div>
+            {!isFormView && (
+                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                    {/* Show Back button only if not in form view (e.g., directly viewing resume) */}
+                    {/* Note: This Back button might need different logic if you add direct resume viewing */}
+                    {/* For now, it's hidden when isFormView is true */}
+
+                    {/* The Home button - always visible when not in form view */}
+                    {/* Use the onGoHome prop (App.jsx's handleBack) */}
+                    <button onClick={onGoHome}>Home</button>
+                 </div>
+            )}
 
             {/* Main resume content */}
             <div>
