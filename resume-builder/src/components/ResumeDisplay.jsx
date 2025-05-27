@@ -2,6 +2,9 @@ import React from 'react';
 
 // Added isFormView, onBackStep, and onGoHome props for clearer navigation control
 function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
+    // Ensure formData and personalInfo exist before accessing socials
+    const socials = formData?.personalInfo?.socials || [];
+
     return (
         <div>
             {/* Navigation bar with Back and Home buttons */}
@@ -23,6 +26,23 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
                 {/* Personal Information section */}
                 <h1>{formData.personalInfo.FirstName} {formData.personalInfo.LastName}</h1>
                 <p>{formData.personalInfo.Description}</p>
+
+                {/* Social Media Links section */}
+                {socials.length > 0 && (
+                    <div>
+                        <h3>Social Links</h3>
+                        <ul>
+                            {socials.map((social, index) => (
+                                // Only display if both platform and url are provided
+                                social.platform && social.url && (
+                                    <li key={index}>
+                                        {social.platform}: <a href={social.url} target="_blank" rel="noopener noreferrer">{social.url}</a>
+                                    </li>
+                                )
+                            ))}
+                        </ul>
+                    </div>
+                )}
 
                 {/* Education section - shows all education entries */}
                 <h2>Education</h2>
