@@ -7,6 +7,7 @@ function EducationForm({ initialData, onSubmit }) {
             id: '1',
             institution: '',
             degree: '',
+            location: '',
             graduationDate: '',
             hasGraduated: false
         }
@@ -36,6 +37,7 @@ function EducationForm({ initialData, onSubmit }) {
             id: Date.now().toString(), // Generate unique ID
             institution: '',
             degree: '',
+            location: '',
             graduationDate: '',
             hasGraduated: false
         };
@@ -86,6 +88,17 @@ function EducationForm({ initialData, onSubmit }) {
                             onChange={(e) => handleEducationChange(entry.id, 'degree', e.target.value)}
                             placeholder="e.g., Bachelor of Science, Master of Arts"
                             required
+                        />
+                    </div>
+
+                    {/* College Location Input */}
+                    <div>
+                        <label>College Location (City, State):</label>
+                        <input
+                            type="text"
+                            value={entry.location}
+                            onChange={(e) => handleEducationChange(entry.id, 'location', e.target.value)}
+                            placeholder="e.g., Houston, Texas"
                         />
                     </div>
 

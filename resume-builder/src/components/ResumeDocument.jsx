@@ -1,6 +1,16 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 
+// Helper function to format date from MM-YYYY to Month YYYY
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const [year, month] = dateString.split('-');
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+                      "July", "August", "September", "October", "November", "December"];
+  const monthName = monthNames[parseInt(month, 10) - 1];
+  return `${monthName} ${year}`;
+};
+
 // No Font.register needed for built-in fonts like Times-Roman
 
 // Create styles - Adjusted to use Times-Roman and keep your requested sizes
@@ -119,9 +129,16 @@ const ResumeDocument = ({ formData }) => (
           <Text style={styles.heading}>EDUCATION</Text>
           {formData.education.map((edu, index) => (
             <View key={index} style={{ marginBottom: 5 }}>
-              <Text style={styles.subheading}>{edu.institution}</Text>
-              <Text style={styles.text}>{edu.degree} - {edu.field}</Text>
-              <Text style={styles.text}>{edu.hasGraduated ? 'Graduated' : 'In Progress'} - {edu.graduationDate}</Text>
+              {/* Institution name on the left, Location on the right */}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={styles.subheading}>{edu.institution}</Text>
+                <Text style={styles.text}>{edu.location}</Text>
+              </View>
+              {/* Degree/Field on the left, Graduation on the right */}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                 <Text style={styles.text}>{edu.degree} {edu.field}</Text>
+                 <Text style={[styles.text, { fontStyle: 'italic' }]}>{edu.hasGraduated ? 'Graduated' : 'Expected Graduation'}, {formatDate(edu.graduationDate)}</Text>
+              </View>
             </View>
           ))}
         </View>
@@ -133,7 +150,7 @@ const ResumeDocument = ({ formData }) => (
           {formData.experience.map((exp, index) => (
             <View key={index} style={{ marginBottom: 5 }}>
               <Text style={styles.subheading}>{exp.position} at {exp.company}</Text>
-              <Text style={styles.text}>{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</Text>
+              <Text style={styles.text}>{formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}</Text>
               {exp.bulletPoints && exp.bulletPoints.map((point, idx) => (
                 <Text key={idx} style={styles.bulletPoint}>• {point}</Text>
               ))}
@@ -148,7 +165,7 @@ const ResumeDocument = ({ formData }) => (
           {formData.projects.map((project, index) => (
             <View key={index} style={{ marginBottom: 5 }}>
               <Text style={styles.subheading}>{project.projectName} - {project.role}</Text>
-              <Text style={styles.text}>{project.startDate} - {project.isCurrent ? 'Present' : project.endDate}</Text>
+              <Text style={styles.text}>{formatDate(project.startDate)} - {project.isCurrent ? 'Present' : formatDate(project.endDate)}</Text>
               {project.bulletPoints && project.bulletPoints.map((point, idx) => (
                 <Text key={idx} style={styles.bulletPoint}>• {point}</Text>
               ))}
