@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import ResumeDocument from './ResumeDocument'; // Import the new component
 
 // Added isFormView, onBackStep, and onGoHome props for clearer navigation control
 function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
     // Ensure formData and personalInfo exist before accessing socials
     const socials = formData?.personalInfo?.socials || [];
+
+    // PDF generation setup
+    const targetRef = useRef();
+
+    const handleDownloadPDF = () => {
+        console.log('Attempting to generate PDF via handleDownloadPDF');
+        const targetElement = document.getElementById('resume-content');
+        console.log('Target element check:', targetElement);
+        if (targetElement) {
+            // This method is now replaced by PDFDownloadLink
+        } else {
+            console.error('Target element not available for PDF generation in handleDownloadPDF.', 'Element ID: resume-content');
+        }
+    };
 
     return (
         <div>
@@ -18,11 +34,18 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
                     {/* The Home button - always visible when not in form view */}
                     {/* Use the onGoHome prop (App.jsx's handleBack) */}
                     <button onClick={onGoHome}>Home</button>
+                    
+                    {/* Download PDF Link */}
+                    <PDFDownloadLink document={<ResumeDocument formData={formData} />} fileName="resume.pdf">
+                      {({ blob, url, loading, error }) =>
+                        loading ? 'Loading document...' : 'Download PDF'
+                      }
+                    </PDFDownloadLink>
                  </div>
             )}
 
-            {/* Main resume content */}
-            <div>
+            {/* Main resume content - wrapped with ref for PDF generation */}
+            <div id="resume-content" ref={targetRef}>
                 {/* Personal Information section */}
                 <h1>{formData.personalInfo.FirstName} {formData.personalInfo.LastName}</h1>
                 <p>{formData.personalInfo.Description}</p>

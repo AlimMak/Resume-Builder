@@ -1,0 +1,172 @@
+import React from 'react';
+import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+
+// No Font.register needed for built-in fonts like Times-Roman
+
+// Create styles - Adjusted to use Times-Roman and keep your requested sizes
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'column',
+    backgroundColor: '#ffffff',
+    paddingTop: 20, // Reduced top padding
+    paddingHorizontal: 30, // Keep horizontal padding
+    paddingBottom: 30,
+    fontFamily: 'Times-Roman', // Use Times-Roman built-in font
+  },
+  section: {
+    marginBottom: 8, // Further reduced space between sections
+    paddingBottom: 0, // Remove padding at the bottom of each section view
+  },
+  heading: {
+    fontSize: 12, // Section title size - Calibri size 12
+    fontWeight: 'bold',
+    marginBottom: 3,
+    borderBottom: '1 solid #000',
+    paddingBottom: 1,
+    fontFamily: 'Times-Roman',
+  },
+  nameHeading: {
+    fontSize: 16, // Name size - Calibri size 16
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 3, // Reduced space below name
+    fontFamily: 'Times-Roman',
+  },
+  subheading: {
+    fontSize: 10.5, // Calibri size 10.5
+    fontWeight: 'bold',
+    marginBottom: 2,
+    fontFamily: 'Times-Roman',
+  },
+  text: {
+    fontSize: 10.5, // Calibri size 10.5
+    marginBottom: 1,
+    fontFamily: 'Times-Roman',
+  },
+  bulletPoint: {
+    fontSize: 10.5, // Calibri size 10.5
+    marginBottom: 1,
+    marginLeft: 10,
+    fontFamily: 'Times-Roman',
+  },
+  contactInfo: {
+    fontSize: 10.5, // Calibri size 10.5
+    marginBottom: 3, // Reduced space below contact info line
+    fontFamily: 'Times-Roman',
+  },
+   socialLinksContainer: {
+    marginTop: 3, // Small space above social links
+    marginBottom: 10, // Space below social links section
+    textAlign: 'center', // Center social links
+  },
+  inlineText: {
+    fontSize: 10.5, // Calibri size 10.5
+    marginBottom: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    fontFamily: 'Times-Roman',
+    justifyContent: 'center', // Center inline text like contact info
+  },
+  inlineTextItem: {
+    marginRight: 5,
+    fontFamily: 'Times-Roman',
+  },
+  personalInfoContainer: {
+    textAlign: 'center',
+    marginBottom: 4, // Reduced space by half
+  }
+});
+
+// Create Document Component
+const ResumeDocument = ({ formData }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.personalInfoContainer}>
+        <Text style={styles.nameHeading}>{formData.personalInfo.FirstName} {formData.personalInfo.LastName}</Text>
+        {/* Personal Info details */}
+        <View style={styles.inlineText}>
+          {/* Removed description text */}
+          {formData.personalInfo.Email && <Text style={styles.inlineTextItem}> {formData.personalInfo.Email}</Text>}
+          {formData.personalInfo.Phone && <Text style={styles.inlineTextItem}> | {formData.personalInfo.Phone}</Text>}
+          {/* Add other relevant contact info */}
+        </View>
+         {/* Social Links - moved here and centered */}
+         {formData.personalInfo.socials && formData.personalInfo.socials.length > 0 && (
+           <View style={styles.socialLinksContainer}>
+             <View style={styles.inlineText}>
+               {formData.personalInfo.socials.map((social, index) => (
+                 // Only display if platform and url are provided
+                 social.platform && social.url && (
+                   <Text key={index} style={styles.inlineTextItem}>
+                     {social.platform}: {social.url}
+                   </Text>
+                 )
+               ))}
+             </View>
+           </View>
+         )}
+        {/* Add LinkedIn and GitHub here if they are part of socials and you want them in the main contact line */}
+         <View style={styles.inlineText}>
+           {formData.personalInfo.LinkedIn && <Text style={styles.inlineTextItem}> | LinkedIn: {formData.personalInfo.LinkedIn}</Text>}
+           {formData.personalInfo.GitHub && <Text style={styles.inlineTextItem}> | GitHub: {formData.personalInfo.GitHub}</Text>}
+         </View>
+
+      </View>
+
+
+      {formData.education && formData.education.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.heading}>EDUCATION</Text>
+          {formData.education.map((edu, index) => (
+            <View key={index} style={{ marginBottom: 5 }}>
+              <Text style={styles.subheading}>{edu.institution}</Text>
+              <Text style={styles.text}>{edu.degree} - {edu.field}</Text>
+              <Text style={styles.text}>{edu.hasGraduated ? 'Graduated' : 'In Progress'} - {edu.graduationDate}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {formData.experience && formData.experience.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.heading}>EXPERIENCE</Text>
+          {formData.experience.map((exp, index) => (
+            <View key={index} style={{ marginBottom: 5 }}>
+              <Text style={styles.subheading}>{exp.position} at {exp.company}</Text>
+              <Text style={styles.text}>{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</Text>
+              {exp.bulletPoints && exp.bulletPoints.map((point, idx) => (
+                <Text key={idx} style={styles.bulletPoint}>• {point}</Text>
+              ))}
+            </View>
+          ))}
+        </View>
+      )}
+
+      {formData.projects && formData.projects.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.heading}>PROJECTS</Text>
+          {formData.projects.map((project, index) => (
+            <View key={index} style={{ marginBottom: 5 }}>
+              <Text style={styles.subheading}>{project.projectName} - {project.role}</Text>
+              <Text style={styles.text}>{project.startDate} - {project.isCurrent ? 'Present' : project.endDate}</Text>
+              {project.bulletPoints && project.bulletPoints.map((point, idx) => (
+                <Text key={idx} style={styles.bulletPoint}>• {point}</Text>
+              ))}
+            </View>
+          ))}
+        </View>
+      )}
+
+       {formData.skills && formData.skills.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.heading}>SKILLS</Text>
+          <Text style={styles.text}>
+            {formData.skills.map(skill => skill.name).join(', ')}
+          </Text>
+        </View>
+      )}
+    </Page>
+  </Document>
+);
+
+export default ResumeDocument; 
