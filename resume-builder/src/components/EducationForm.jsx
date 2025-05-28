@@ -6,6 +6,7 @@ function EducationForm({ initialData, onSubmit }) {
         {
             id: '1',
             institution: '',
+            degree: '',
             graduationDate: '',
             hasGraduated: false
         }
@@ -34,6 +35,7 @@ function EducationForm({ initialData, onSubmit }) {
         const newEntry = {
             id: Date.now().toString(), // Generate unique ID
             institution: '',
+            degree: '',
             graduationDate: '',
             hasGraduated: false
         };
@@ -71,6 +73,18 @@ function EducationForm({ initialData, onSubmit }) {
                             value={entry.institution}
                             onChange={(e) => handleEducationChange(entry.id, 'institution', e.target.value)}
                             placeholder="Enter institution name"
+                            required
+                        />
+                    </div>
+
+                    {/* Degree Input */}
+                    <div>
+                        <label>Degree:</label>
+                        <input
+                            type="text"
+                            value={entry.degree}
+                            onChange={(e) => handleEducationChange(entry.id, 'degree', e.target.value)}
+                            placeholder="e.g., Bachelor of Science, Master of Arts"
                             required
                         />
                     </div>
