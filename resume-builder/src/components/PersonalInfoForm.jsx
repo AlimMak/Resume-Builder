@@ -7,13 +7,19 @@ function PersonalInfoForm({ initialData, onSubmit }){
             FirstName: '',
             LastName: '',
             Description: '',
-            socials: [{ platform: '', url: '' }]
+            socials: [{ platform: '', url: '' }],
+            isUSCitizen: '',
+            Email: '',
+            Phone: ''
         };
         // Merge initialData with default structure, prioritizing initialData
         return initialData ? {
             ...defaultInputs,
             ...initialData,
-            socials: initialData.socials || [{ platform: '', url: '' }]
+            socials: initialData.socials || [{ platform: '', url: '' }],
+            isUSCitizen: initialData.isUSCitizen || '',
+            Email: initialData.Email || '',
+            Phone: initialData.Phone || ''
         } : defaultInputs;
     });
 
@@ -21,7 +27,10 @@ function PersonalInfoForm({ initialData, onSubmit }){
         FirstName: '',
         LastName: '',
         Description: '',
-        socials: []
+        socials: [],
+        isUSCitizen: '',
+        Email: '',
+        Phone: ''
     });
 
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -32,7 +41,10 @@ function PersonalInfoForm({ initialData, onSubmit }){
              setInputs(prev => ({
                 ...prev,
                 ...initialData,
-                socials: initialData.socials || [{ platform: '', url: '' }]
+                socials: initialData.socials || [{ platform: '', url: '' }],
+                isUSCitizen: initialData.isUSCitizen || '',
+                Email: initialData.Email || '',
+                Phone: initialData.Phone || ''
              }));
         }
     }, [initialData]);
@@ -63,13 +75,28 @@ function PersonalInfoForm({ initialData, onSubmit }){
             newErrors.Description = '';
         }
 
+        if (!inputs.Email.trim()) {
+            newErrors.Email = "Email is required";
+            isValid = false;
+        } else {
+            newErrors.Email = '';
+        }
+
+        if (!inputs.Phone.trim()) {
+            newErrors.Phone = "Phone number is required";
+            isValid = false;
+        } else {
+            newErrors.Phone = '';
+        }
+
         // Validate socials only if inputs.socials is an array
         const socialErrors = Array.isArray(inputs.socials) ? inputs.socials.map(social => {
-            if (social.platform && !social.url) {
-                return { platform: '', url: 'URL is required when platform is provided' };
-            }
-            if (!social.platform && social.url) {
-                return { platform: 'Platform is required when URL is provided', url: '' };
+            // Require platform if username is provided
+            if (social.url && !social.platform) {
+                return { platform: 'Platform is required when username is provided', url: '' };
+            } else if (social.platform && !social.url) {
+               // If a platform is selected, but no username is provided, it's not an error anymore
+               return { platform: '', url: '' };
             }
             return { platform: '', url: '' };
         }) : []; // Return empty array if socials is not an array
@@ -217,19 +244,64 @@ function PersonalInfoForm({ initialData, onSubmit }){
                 {errors.Description && <div className="text-red-500 text-sm">{errors.Description}</div>}
             </div>
 
+            <div className="space-y-2">
+                <label htmlFor="isUSCitizen" className="block text-sm font-medium text-gray-700">US Citizen?</label>
+                <select 
+                    id="isUSCitizen"
+                    name="isUSCitizen"
+                    value={inputs.isUSCitizen}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                >
+                    <option value="">Select...</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+                {errors.isUSCitizen && <div className="text-red-500 text-sm">{errors.isUSCitizen}</div>}
+            </div>
+
+            <div className="space-y-2">
+                <input 
+                    type="email" 
+                    name="Email" 
+                    value={inputs.Email} 
+                    onChange={handleInputChange} 
+                    placeholder="Enter Email Address"
+                    className="w-full p-2 border rounded"
+                />
+                {errors.Email && <div className="text-red-500 text-sm">{errors.Email}</div>}
+            </div>
+
+            <div className="space-y-2">
+                <input 
+                    type="tel" 
+                    name="Phone" 
+                    value={inputs.Phone} 
+                    onChange={handleInputChange} 
+                    placeholder="Enter Phone Number"
+                    className="w-full p-2 border rounded"
+                />
+                {errors.Phone && <div className="text-red-500 text-sm">{errors.Phone}</div>}
+            </div>
+
             <div className="space-y-4">
                 <h3 className="text-xl font-semibold">Social Media Links</h3>
                 {/* Add a check here to ensure inputs.socials is an array */}
                 {Array.isArray(inputs.socials) && inputs.socials.map((social, index) => (
                     <div key={index} className="flex gap-2 items-start">
                         <div className="flex-1">
-                            <input
-                                type="text"
+                            {/* Dropdown for platform selection */}
+                            <select
                                 value={social.platform}
                                 onChange={(e) => handleSocialChange(index, 'platform', e.target.value)}
-                                placeholder="Platform (e.g., LinkedIn, GitHub)"
                                 className="w-full p-2 border rounded mb-2"
-                            />
+                            >
+                                <option value="">Select Platform</option>
+                                <option value="LinkedIn">LinkedIn</option>
+                                <option value="GitHub">GitHub</option>
+                                <option value="Portfolio">Portfolio</option>
+                                {/* Add more relevant platforms as needed */}
+                            </select>
                             {/* Add a check for errors.socials[index] being defined */}
                             {errors.socials && errors.socials[index]?.platform && (
                                 <div className="text-red-500 text-sm">{errors.socials[index].platform}</div>
@@ -237,10 +309,10 @@ function PersonalInfoForm({ initialData, onSubmit }){
                         </div>
                         <div className="flex-1">
                             <input
-                                type="url"
+                                type="text"
                                 value={social.url}
                                 onChange={(e) => handleSocialChange(index, 'url', e.target.value)}
-                                placeholder="URL"
+                                placeholder="Username"
                                 className="w-full p-2 border rounded mb-2"
                             />
                             {/* Add a check for errors.socials[index] being defined */}
