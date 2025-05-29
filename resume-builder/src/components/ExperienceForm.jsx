@@ -171,6 +171,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
               onChange={(e) => handleBulletPointChange(index, e.target.value)}
               placeholder="Enter a bullet point"
               style={{ flex: 1 }}
+              maxLength={300}
             />
             {/* Show remove button only if there is more than one bullet point */}
             {experience.bulletPoints.length > 1 && (

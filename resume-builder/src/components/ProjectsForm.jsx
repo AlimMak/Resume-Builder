@@ -165,6 +165,7 @@ function ProjectsForm({ initialData, onSubmit }) {
                                     onChange={(e) => handleBulletPointChange(entry.id, bulletIndex, e.target.value)}
                                     placeholder="Enter a bullet point"
                                     style={{ flex: 1 }}
+                                    maxLength={300}
                                 />
                                 {entry.bulletPoints.length > 1 && (
                                     <button
