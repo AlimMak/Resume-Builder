@@ -73,6 +73,7 @@ function App() {
         <ResumeDisplay 
           onGoHome={handleBack} 
           formData={formData}
+          isFormView={false}
         />
       )}
     </div>
