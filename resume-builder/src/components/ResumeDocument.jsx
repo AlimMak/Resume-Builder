@@ -171,7 +171,7 @@ const ResumeDocument = ({ formData }) => (
         <View style={styles.section}>
           <Text style={styles.heading}>SKILLS</Text>
           <Text style={styles.text}>
-            {formData.skills.map(skill => skill.name).join(', ')}
+            {formData.skills.join(', ')}
           </Text>
         </View>
       )}

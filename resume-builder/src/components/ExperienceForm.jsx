@@ -1,4 +1,5 @@
 import React from 'react';
+import { debounce } from './ResumeDisplay';
 
 // This defines what a single job experience looks like
 const initialExperience = {
@@ -17,41 +18,55 @@ const initialExperience = {
 // This component displays and manages ONE job experience form
 function ExperienceForm({ experience, onChange, onRemove }) {
   
+  // Debounce the onChange prop
+  const debouncedOnChange = React.useCallback(debounce(onChange, 300), [onChange]);
+
   // Handles changes to any form field
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     // Updates the parent component with new values
-    onChange({
+    const updatedExperience = {
       ...experience,         // Keep existing values
       [name]: type === 'checkbox' ? checked : value // Update changed field
-    });
+    };
+    if (type === 'text' || type === 'month') {
+      debouncedOnChange(updatedExperience); // Debounce for text and month inputs
+    } else {
+      onChange(updatedExperience); // Call immediately for checkboxes and selects
+    }
   };
 
   // Handle changes to a specific bullet point
   const handleBulletPointChange = (index, value) => {
     const newBulletPoints = [...experience.bulletPoints];
     newBulletPoints[index] = value;
-    onChange({
+    const updatedExperience = {
       ...experience,
       bulletPoints: newBulletPoints
-    });
+    };
+    debouncedOnChange(updatedExperience); // Debounce bullet point changes
   };
 
   // Add a new empty bullet point
   const handleAddBulletPoint = () => {
-    onChange({
+    const updatedExperience = {
       ...experience,
       bulletPoints: [...experience.bulletPoints, '']
-    });
+    };
+    // Defer the state update to avoid render-related issues
+    setTimeout(() => {
+      onChange(updatedExperience); 
+    }, 0);
   };
 
   // Remove a bullet point by index
   const handleRemoveBulletPoint = (index) => {
     const newBulletPoints = experience.bulletPoints.filter((_, i) => i !== index);
-    onChange({
+    const updatedExperience = {
       ...experience,
       bulletPoints: newBulletPoints
-    });
+    };
+    onChange(updatedExperience); // Call immediately for removing bullet point
   };
 
   return (

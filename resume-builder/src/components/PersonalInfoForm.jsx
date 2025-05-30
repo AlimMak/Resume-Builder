@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { debounce } from "./ResumeDisplay";
 
-function PersonalInfoForm({ initialData, onSubmit }){
+const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     const [inputs, setInputs] = useState(() => {
         // Initialize with default structure, ensuring socials is always an array
         const defaultInputs = {
@@ -22,6 +23,9 @@ function PersonalInfoForm({ initialData, onSubmit }){
             Phone: initialData.Phone || ''
         } : defaultInputs;
     });
+
+    // Debounce the onSubmit prop
+    const debouncedOnSubmit = React.useCallback(debounce(onSubmit, 300), [onSubmit]);
 
     const [errors, setErrors] = useState({
         FirstName: '',
@@ -112,10 +116,16 @@ function PersonalInfoForm({ initialData, onSubmit }){
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setInputs(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        let newInputs;
+        setInputs(prev => {
+            newInputs = {
+                ...prev,
+                [name]: value
+            };
+            return newInputs;
+        });
+
+        debouncedOnSubmit(newInputs); // Call debounced onSubmit on change
 
         // will clear the error when typing starts
         if (errors[name]) {
@@ -138,12 +148,19 @@ function PersonalInfoForm({ initialData, onSubmit }){
             return;
         }
 
-        setInputs(prev => ({
-            ...prev,
-            socials: prev.socials.map((social, i) => 
+        let newInputs;
+        setInputs(prev => {
+            const newSocials = prev.socials.map((social, i) => 
                 i === index ? { ...social, [field]: value } : social
-            )
-        }));
+            );
+            newInputs = {
+                ...prev,
+                socials: newSocials
+            };
+            return newInputs;
+        });
+
+        onSubmit(newInputs); // Call onSubmit immediately on change
 
         // Clear social errors when typing
         if (errors.socials[index]?.[field]) {
@@ -164,10 +181,16 @@ function PersonalInfoForm({ initialData, onSubmit }){
          }
 
         if (inputs.socials.length < 5) {
-            setInputs(prev => ({
-                ...prev,
-                socials: [...prev.socials, { platform: '', url: '' }]
-            }));
+            let newInputs;
+            setInputs(prev => {
+                const newSocials = [...prev.socials, { platform: '', url: '' }];
+                newInputs = {
+                    ...prev,
+                    socials: newSocials
+                };
+                return newInputs;
+            });
+            onSubmit(newInputs); // Call onSubmit immediately on adding social
             setErrors(prev => ({
                 ...prev,
                 socials: [...prev.socials, { platform: '', url: '' }]
@@ -182,10 +205,16 @@ function PersonalInfoForm({ initialData, onSubmit }){
             return;
         }
 
-        setInputs(prev => ({
-            ...prev,
-            socials: prev.socials.filter((_, i) => i !== index)
-        }));
+        let newInputs;
+        setInputs(prev => {
+            const newSocials = prev.socials.filter((_, i) => i !== index);
+            newInputs = {
+                ...prev,
+                socials: newSocials
+            };
+            return newInputs;
+        });
+        onSubmit(newInputs); // Call onSubmit immediately on removing social
         setErrors(prev => ({
             ...prev,
             socials: prev.socials.filter((_, i) => i !== index) // Also filter errors array
@@ -205,7 +234,7 @@ function PersonalInfoForm({ initialData, onSubmit }){
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} ref={ref} className="space-y-4">
             <h2 className="text-2xl font-bold mb-4">Personal Information</h2>
             
             <div className="space-y-2">
@@ -356,6 +385,6 @@ function PersonalInfoForm({ initialData, onSubmit }){
             )}
         </form>
     ); 
-}
+});
 
 export default PersonalInfoForm;

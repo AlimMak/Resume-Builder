@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { debounce } from './ResumeDisplay';
 
-function EducationForm({ initialData, onSubmit }) {
+const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     // State to store all education entries
     const [educationEntries, setEducationEntries] = useState([
         {
@@ -13,6 +14,9 @@ function EducationForm({ initialData, onSubmit }) {
         }
     ]);
 
+    // Debounce the onSubmit prop
+    const debouncedOnSubmit = React.useCallback(debounce(onSubmit, 300), [onSubmit]);
+
     // Initialize form with initialData if provided
     useEffect(() => {
         if (initialData && initialData.length > 0) {
@@ -22,13 +26,16 @@ function EducationForm({ initialData, onSubmit }) {
 
     // Function to handle changes in any education entry
     const handleEducationChange = (id, field, value) => {
-        setEducationEntries(prevEntries => 
-            prevEntries.map(entry => 
+        let newEntries;
+        setEducationEntries(prevEntries => {
+            newEntries = prevEntries.map(entry => 
                 entry.id === id 
                     ? { ...entry, [field]: value }
                     : entry
-            )
-        );
+            );
+            debouncedOnSubmit(newEntries); // Call debounced onSubmit on change
+            return newEntries;
+        });
     };
 
     // Function to add a new education entry
@@ -41,27 +48,34 @@ function EducationForm({ initialData, onSubmit }) {
             graduationDate: '',
             hasGraduated: false
         };
-        setEducationEntries(prev => [...prev, newEntry]);
+        let newEntries;
+        setEducationEntries(prev => {
+            newEntries = [...prev, newEntry];
+            onSubmit(newEntries); // Call onSubmit immediately on adding entry (adding an entry is a discrete action)
+            return newEntries;
+        });
     };
 
     // Function to remove an education entry
     const removeEducationEntry = (id) => {
         // Don't remove if it's the last entry
         if (educationEntries.length > 1) {
-            setEducationEntries(prev => 
-                prev.filter(entry => entry.id !== id)
-            );
+            let newEntries;
+            setEducationEntries(prev => {
+                newEntries = prev.filter(entry => entry.id !== id);
+                onSubmit(newEntries); // Call onSubmit immediately on removing entry (removing an entry is a discrete action)
+                return newEntries;
+            });
         }
     };
 
-    // Function to handle form submission
+    // Function to handle form submission - keep for validation, but onSubmit is now called on change
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(educationEntries);
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} ref={ref}>
             <h2>Education</h2>
             
             {/* Map through all education entries */}
@@ -146,6 +160,6 @@ function EducationForm({ initialData, onSubmit }) {
             <button type="submit">Next: Work Experience</button>
         </form>
     );
-}
+});
 
 export default EducationForm;

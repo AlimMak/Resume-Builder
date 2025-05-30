@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import ExperienceForm from './ExperienceForm';
+import { debounce } from './ResumeDisplay';
 
 // Same initial structure as before
 const initialExperience = {
@@ -16,11 +18,12 @@ const initialExperience = {
 };
 
 // This component manages ALL job experiences
-function ExperienceSection({ initialData, onSubmit }) {
+const ExperienceSection = React.forwardRef(({ initialData, onSubmit }, ref) => {
   // State stores an array of experiences
-  const [experiences, setExperiences] = useState([
-    { ...initialExperience, id: '1' } // Start with one empty experience
-  ]);
+  const [experiences, setExperiences] = useState(initialData || []);
+
+  // Debounce the onSubmit prop
+  const debouncedOnSubmit = React.useCallback(debounce(onSubmit, 300), [onSubmit]);
 
   // Initialize form with initialData if provided
   useEffect(() => {
@@ -34,36 +37,41 @@ function ExperienceSection({ initialData, onSubmit }) {
     setExperiences(experiences.map(exp => 
       exp.id === id ? updatedExperience : exp // Replace the matching experience
     ));
+    debouncedOnSubmit(experiences.map(exp => exp.id === id ? updatedExperience : exp)); // Debounce onSubmit on change
   };
 
   // Adds a new empty experience
   const addNewExperience = () => {
-    setExperiences([
+    const newExperiences = [
       ...experiences, // Keep existing experiences
       { ...initialExperience, id: Date.now().toString() } // Add new one
-    ]);
+    ];
+    setExperiences(newExperiences);
   };
 
   // Removes an experience (but keeps at least one)
   const removeExperience = (id) => {
     if (experiences.length > 1) {
       // Filter out the experience with matching ID
-      setExperiences(experiences.filter(exp => exp.id !== id));
+      const newExperiences = experiences.filter(exp => exp.id !== id);
+      setExperiences(newExperiences);
+      onSubmit(newExperiences); // Call onSubmit immediately on removing experience
     } else {
       // If it's the last one, reset it instead
-      setExperiences([{ ...initialExperience, id: '1' }]);
+      const newExperiences = [{ ...initialExperience, id: '1' }];
+      setExperiences(newExperiences);
+      onSubmit(newExperiences); // Call onSubmit immediately on resetting experience
     }
   };
 
-  // Handle form submission
+  // Handle form submission - keep for validation, but onSubmit is now called on change
   const handleSubmit = (e) => {
     e.preventDefault();
     // console.log('ExperienceSection - Submitting experiences:', experiences);
-    onSubmit(experiences);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} ref={ref}>
       <h2>Work Experience</h2>
       
       {/* Render an ExperienceForm for each experience */}
@@ -85,6 +93,6 @@ function ExperienceSection({ initialData, onSubmit }) {
       <button type="submit">Next: Projects</button>
     </form>
   );
-}
+});
 
 export default ExperienceSection;

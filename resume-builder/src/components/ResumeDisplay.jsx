@@ -22,6 +22,18 @@ const formatPhoneNumber = (phoneNumberString) => {
   return phoneNumberString;
 };
 
+// Simple debounce function
+export function debounce(func, delay) {
+  let timer;
+  return function(...args) {
+    const context = this;
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(context, args);
+    }, delay);
+  };
+}
+
 // Styles object for the preview - Ensuring correct React inline style format
 const styles = {
   container: {
@@ -107,11 +119,13 @@ const styles = {
     padding: '20px', // Add some padding inside the border
     backgroundColor: '#fff', // Ensure background is white
   },
+  highlightedSection: {
+    backgroundColor: '#f0f0f0', // Light grey background for highlighting
+    cursor: 'pointer', // Indicate that the section is clickable
+  },
 };
 
-function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
-    console.log('ResumeDisplay - Received formData:', formData);
-    console.log('ResumeDisplay - isFormView:', isFormView);
+function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onSectionClick, onSectionHover, hoveredSection }) {
     const socials = formData?.personalInfo?.socials || [];
     const targetRef = useRef();
 
@@ -142,7 +156,12 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
 
             <div id="resume-content" ref={targetRef} style={styles.pagePreview}>
                 {/* Personal Information */}
-                <div style={styles.personalInfoContainer}>
+                <div 
+                  style={hoveredSection === 'personalInfo' ? {...styles.personalInfoContainer, ...styles.highlightedSection} : styles.personalInfoContainer}
+                  onClick={() => onSectionClick('personalInfo')}
+                  onMouseEnter={() => onSectionHover('personalInfo')}
+                  onMouseLeave={() => onSectionHover(null)}
+                >
                     <h1 style={styles.nameHeading}>
                         {formData.personalInfo.FirstName} {formData.personalInfo.LastName}
                     </h1>
@@ -180,7 +199,12 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
 
                 {/* Education Section */}
                 {formData.education && formData.education.length > 0 && (
-                    <div style={styles.section}>
+                    <div 
+                      style={hoveredSection === 'education' ? {...styles.section, ...styles.highlightedSection} : styles.section}
+                      onClick={() => onSectionClick('education')}
+                      onMouseEnter={() => onSectionHover('education')}
+                      onMouseLeave={() => onSectionHover(null)}
+                    >
                         <h2 style={styles.heading}>EDUCATION</h2>
                         {formData.education.map((edu, index) => (
                             <div key={index} style={{ marginBottom: '5px' }}>
@@ -208,13 +232,18 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
                 )}
 
                 {/* Skills Section */}
-                {formData.skills && formData.skills.length > 0 && (
-                    <div style={styles.section}>
+                {Array.isArray(formData.skills) && formData.skills.length > 0 && (
+                    <div 
+                      style={hoveredSection === 'skills' ? {...styles.section, ...styles.highlightedSection} : styles.section}
+                      onClick={() => onSectionClick('skills')}
+                      onMouseEnter={() => onSectionHover('skills')}
+                      onMouseLeave={() => onSectionHover(null)}
+                    >
                         <h2 style={styles.heading}>SKILLS</h2>
                         <div style={styles.text}>
                             {formData.skills.map((skill, index) => (
                                 <span key={index}>
-                                    {skill.name}{index < formData.skills.length - 1 ? ', ' : ''}
+                                    {skill}{index < formData.skills.length - 1 ? ', ' : ''}
                                 </span>
                             ))}
                         </div>
@@ -223,7 +252,12 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
 
                 {/* Experience Section */}
                 {formData.experience && formData.experience.length > 0 && (
-                    <div style={styles.section}>
+                    <div 
+                      style={hoveredSection === 'experience' ? {...styles.section, ...styles.highlightedSection} : styles.section}
+                      onClick={() => onSectionClick('experience')}
+                      onMouseEnter={() => onSectionHover('experience')}
+                      onMouseLeave={() => onSectionHover(null)}
+                    >
                         <h2 style={styles.heading}>EXPERIENCE</h2>
                         {formData.experience.map((exp, index) => (
                             <div key={index} style={{ marginBottom: '5px' }}>
@@ -255,7 +289,12 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
 
                 {/* Projects Section */}
                 {formData.projects && formData.projects.length > 0 && (
-                    <div style={styles.section}>
+                    <div 
+                      style={hoveredSection === 'projects' ? {...styles.section, ...styles.highlightedSection} : styles.section}
+                      onClick={() => onSectionClick('projects')}
+                      onMouseEnter={() => onSectionHover('projects')}
+                      onMouseLeave={() => onSectionHover(null)}
+                    >
                         <h2 style={styles.heading}>PROJECTS</h2>
                         {formData.projects.map((project, index) => (
                             <div key={index} style={{ marginBottom: '5px' }}>

@@ -1,28 +1,29 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { debounce } from './ResumeDisplay';
 
-function ProjectsForm({ initialData, onSubmit }) {
-    // State to store all project entries
-    const [projectEntries, setProjectEntries] = useState([
-        {
-            id: '1',
-            projectName: '',
-            role: '',
-            bulletPoints: [''],
-            location: '',
-            startDate: '',
-            endDate: '',
-            isCurrent: false
-        }
-    ]);
+const initialProject = {
+    id: '', // Unique identifier
+    projectName: '', // Name of the project
+    role: '', // Your role in the project
+    startDate: '', // Start date
+    endDate: '', // End date
+    isCurrent: false, // Is this an ongoing project?
+    bulletPoints: [''], // Array of bullet points describing the project
+    location: '', // Location of the project
+};
+
+const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
+    const [projectEntries, setProjectEntries] = useState(initialData || []);
+
+    // Debounce the onSubmit prop
+    const debouncedOnSubmit = React.useCallback(debounce(onSubmit, 300), [onSubmit]);
 
     // Initialize form with initialData if provided
     useEffect(() => {
-        console.log('ProjectsForm - Received initialData:', initialData);
         if (initialData && initialData.length > 0) {
-            console.log('ProjectsForm - Setting project entries from initialData');
             setProjectEntries(initialData);
         } else {
-            console.log('ProjectsForm - Using default project entry');
             setProjectEntries([{
                 id: '1',
                 projectName: '',
@@ -36,7 +37,7 @@ function ProjectsForm({ initialData, onSubmit }) {
         }
     }, [initialData]);
 
-    // Function to handle changes in any project entry field (except bullet points)
+    // Function to handle changes in any project entry
     const handleProjectChange = (id, field, value) => {
         setProjectEntries(prevEntries => 
             prevEntries.map(entry => 
@@ -45,86 +46,84 @@ function ProjectsForm({ initialData, onSubmit }) {
                     : entry
             )
         );
+        debouncedOnSubmit(projectEntries.map(entry => entry.id === id ? { ...entry, [field]: value } : entry)); // Debounce on change
     };
 
-    // Function to handle changes to a specific bullet point in a project entry
-    const handleBulletPointChange = (projectId, bulletIndex, value) => {
-        setProjectEntries(prevEntries =>
-            prevEntries.map(entry => {
+    // Function to handle changes in a specific bullet point of a project entry
+    const handleBulletPointChange = (projectId, pointIndex, value) => {
+        setProjectEntries(prevEntries => {
+            const newEntries = prevEntries.map(entry => {
                 if (entry.id === projectId) {
                     const newBulletPoints = [...entry.bulletPoints];
-                    newBulletPoints[bulletIndex] = value;
+                    newBulletPoints[pointIndex] = value;
                     return { ...entry, bulletPoints: newBulletPoints };
                 }
                 return entry;
-            })
-        );
+            });
+            debouncedOnSubmit(newEntries); // Debounce bullet point change
+            return newEntries;
+        });
     };
 
-    // Function to add a new empty bullet point to a specific project entry
+    // Function to add a new bullet point to a project entry
     const addBulletPoint = (projectId) => {
-        setProjectEntries(prevEntries =>
-            prevEntries.map(entry => {
+        setProjectEntries(prevEntries => {
+            const newEntries = prevEntries.map(entry => {
                 if (entry.id === projectId) {
-                    return {
-                        ...entry,
-                        bulletPoints: [...entry.bulletPoints, '']
-                    };
+                    return { ...entry, bulletPoints: [...entry.bulletPoints, ''] };
                 }
                 return entry;
-            })
-        );
+            });
+            onSubmit(newEntries); // Call immediately on adding bullet point
+            return newEntries;
+        });
     };
 
-    // Function to remove a bullet point from a specific project entry by index
-    const removeBulletPoint = (projectId, bulletIndex) => {
-        setProjectEntries(prevEntries =>
-            prevEntries.map(entry => {
+    // Function to remove a bullet point from a project entry
+    const removeBulletPoint = (projectId, pointIndex) => {
+        setProjectEntries(prevEntries => {
+            const newEntries = prevEntries.map(entry => {
                 if (entry.id === projectId) {
-                    const newBulletPoints = entry.bulletPoints.filter((_, index) => index !== bulletIndex);
-                    return {
-                        ...entry,
-                        // Ensure there is always at least one empty bullet point
-                        bulletPoints: newBulletPoints.length > 0 ? newBulletPoints : ['']
-                    };
+                    const newBulletPoints = entry.bulletPoints.filter((_, i) => i !== pointIndex);
+                    return { ...entry, bulletPoints: newBulletPoints };
                 }
                 return entry;
-            })
-        );
+            });
+            onSubmit(newEntries); // Call immediately on removing bullet point
+            return newEntries;
+        });
     };
 
-    // Function to add a new project entry with a default empty bullet point
+    // Function to add a new project entry
     const addProjectEntry = () => {
-        const newEntry = {
-            id: Date.now().toString(),
-            projectName: '',
-            role: '',
-            bulletPoints: [''],
-            location: '',
-            startDate: '',
-            endDate: '',
-            isCurrent: false
-        };
-        setProjectEntries(prev => [...prev, newEntry]);
+        const newEntry = { ...initialProject, id: uuidv4() };
+        setProjectEntries(prev => {
+            const newEntries = [...prev, newEntry];
+            onSubmit(newEntries); // Call immediately on adding project
+            return newEntries;
+        });
     };
 
     // Function to remove a project entry
     const removeProjectEntry = (id) => {
         if (projectEntries.length > 1) {
-            setProjectEntries(prev => 
-                prev.filter(entry => entry.id !== id)
-            );
+            setProjectEntries(prev => {
+                const newEntries = prev.filter(entry => entry.id !== id);
+                onSubmit(newEntries); // Call immediately on removing project
+                return newEntries;
+            });
         }
     };
 
-    // Function to handle form submission
+    // Handle form submission - keep for validation, but onSubmit is now called on change
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(projectEntries);
+        // console.log('ProjectsForm - Submitting projects:', projectEntries);
+        // onSubmit(projectEntries);
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} ref={ref}>
             <h2>Projects</h2>
             
             {/* Map through all project entries */}
@@ -255,6 +254,6 @@ function ProjectsForm({ initialData, onSubmit }) {
             <button type="submit">Next</button>
         </form>
     );
-}
+});
 
 export default ProjectsForm;
