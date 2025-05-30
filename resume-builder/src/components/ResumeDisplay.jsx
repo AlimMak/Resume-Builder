@@ -101,6 +101,12 @@ const styles = {
   bold: {
     fontWeight: 'bold',
   },
+  pagePreview: {
+    border: '1px solid #000', // Black border
+    boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.2)', // Subtle shadow
+    padding: '20px', // Add some padding inside the border
+    backgroundColor: '#fff', // Ensure background is white
+  },
 };
 
 function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
@@ -134,7 +140,7 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome }) {
                 </div>
             )}
 
-            <div id="resume-content" ref={targetRef}>
+            <div id="resume-content" ref={targetRef} style={styles.pagePreview}>
                 {/* Personal Information */}
                 <div style={styles.personalInfoContainer}>
                     <h1 style={styles.nameHeading}>
