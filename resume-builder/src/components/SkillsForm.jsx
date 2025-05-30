@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { debounce } from './ResumeDisplay';
 
 const SkillsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     const [skills, setSkills] = useState(initialData || []); // Initialize with an empty array
     const [currentSkill, setCurrentSkill] = useState(''); // State for the skill currently being entered
 
-    // Debounce the onSubmit prop
-    const debouncedOnSubmit = React.useCallback(debounce(onSubmit, 300), [onSubmit]);
-
     // Initialize form with initialData if provided
     useEffect(() => {
-        console.log('SkillsForm - Received initialData:', initialData);
         // Ensure initialData is an array of strings, defaulting to empty if not valid
         if (Array.isArray(initialData) && initialData.every(skill => typeof skill === 'string')) {
             setSkills(initialData);
@@ -24,7 +19,6 @@ const SkillsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
         setSkills(prevSkills => {
             const newSkills = [...prevSkills];
             newSkills[index] = value;
-            debouncedOnSubmit(newSkills); // Debounce on change for existing skills
             return newSkills;
         });
     };
@@ -37,73 +31,60 @@ const SkillsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     // Function to add the current skill to the skills list
     const addSkillEntry = () => {
         if (currentSkill.trim()) { // Only add if the input is not empty
-            const newSkills = [...skills, currentSkill.trim()];
-            setSkills(newSkills);
+            setSkills(prev => [...prev, currentSkill.trim()]);
             setCurrentSkill(''); // Clear the input after adding
-            // Defer the state update to avoid render-related issues
-            setTimeout(() => {
-                onSubmit(newSkills); // Call immediately on adding skill
-            }, 0);
         }
     };
 
     // Function to remove a skill entry
     const removeSkillEntry = (index) => {
-        // Don't remove if it's the last entry
-        if (skills.length > 0) { // Allow removing the last skill
-            setSkills(prev => {
-                const newSkills = prev.filter((_, i) => i !== index);
-                // Defer the state update to avoid render-related issues
-                setTimeout(() => {
-                    onSubmit(newSkills); // Call immediately on removing skill
-                }, 0);
-                return newSkills;
-            });
-        }
+        setSkills(prev => prev.filter((_, i) => i !== index));
     };
 
-    // Handle form submission - keep for validation, but onSubmit is now called on change
-    const handleSubmit = (e) => {
+    // Handle save button click
+    const handleSave = (e) => {
         e.preventDefault();
-        // console.log('SkillsForm - Submitting skills:', skills);
-        // onSubmit(skills);
+        onSubmit(skills);
     };
 
     return (
-        <form onSubmit={handleSubmit} ref={ref}>
-            <h2>Skills</h2>
+        <form onSubmit={handleSave} ref={ref} className="space-y-4">
+            <h2 className="text-2xl font-bold mb-4">Skills</h2>
             
             {/* Input for new skill */}
-            <div>
+            <div className="flex gap-2">
                 <input
                     type="text"
                     value={currentSkill}
                     onChange={handleCurrentSkillChange}
                     placeholder="Enter a skill"
+                    className="flex-1 p-2 border rounded"
                 />
                 <button 
                     type="button" 
                     onClick={addSkillEntry}
                     disabled={!currentSkill.trim()}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                     Add Skill
                 </button>
             </div>
 
             {/* Display all skills */}
-            <div>
+            <div className="space-y-2">
                 {skills.map((skill, index) => (
-                    <div key={index} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                    <div key={index} className="flex gap-2">
                         <input
                             type="text"
                             value={skill}
                             onChange={(e) => handleExistingSkillChange(index, e.target.value)}
                             placeholder="Enter a skill"
-                            style={{ flex: 1 }}
+                            className="flex-1 p-2 border rounded"
                         />
                         <button 
                             type="button" 
                             onClick={() => removeSkillEntry(index)}
+                            className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                         >
                             Remove
                         </button>
@@ -111,8 +92,13 @@ const SkillsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                 ))}
             </div>
 
-            {/* Submit Button */}
-            <button type="submit">Next</button>
+            {/* Save Button */}
+            <button 
+                type="submit"
+                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+                Save Skills
+            </button>
         </form>
     );
 });

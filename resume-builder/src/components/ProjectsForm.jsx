@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { debounce } from './ResumeDisplay';
 
 const initialProject = {
     id: '', // Unique identifier
@@ -15,9 +13,6 @@ const initialProject = {
 
 const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     const [projectEntries, setProjectEntries] = useState(initialData || []);
-
-    // Debounce the onSubmit prop
-    const debouncedOnSubmit = React.useCallback(debounce(onSubmit, 300), [onSubmit]);
 
     // Initialize form with initialData if provided
     useEffect(() => {
@@ -46,7 +41,6 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     : entry
             )
         );
-        debouncedOnSubmit(projectEntries.map(entry => entry.id === id ? { ...entry, [field]: value } : entry)); // Debounce on change
     };
 
     // Function to handle changes in a specific bullet point of a project entry
@@ -60,7 +54,6 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                 }
                 return entry;
             });
-            debouncedOnSubmit(newEntries); // Debounce bullet point change
             return newEntries;
         });
     };
@@ -74,7 +67,6 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                 }
                 return entry;
             });
-            onSubmit(newEntries); // Call immediately on adding bullet point
             return newEntries;
         });
     };
@@ -89,88 +81,80 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                 }
                 return entry;
             });
-            onSubmit(newEntries); // Call immediately on removing bullet point
             return newEntries;
         });
     };
 
     // Function to add a new project entry
     const addProjectEntry = () => {
-        const newEntry = { ...initialProject, id: uuidv4() };
-        setProjectEntries(prev => {
-            const newEntries = [...prev, newEntry];
-            onSubmit(newEntries); // Call immediately on adding project
-            return newEntries;
-        });
+        const newEntry = { ...initialProject, id: Date.now().toString() };
+        setProjectEntries(prev => [...prev, newEntry]);
     };
 
     // Function to remove a project entry
     const removeProjectEntry = (id) => {
         if (projectEntries.length > 1) {
-            setProjectEntries(prev => {
-                const newEntries = prev.filter(entry => entry.id !== id);
-                onSubmit(newEntries); // Call immediately on removing project
-                return newEntries;
-            });
+            setProjectEntries(prev => prev.filter(entry => entry.id !== id));
         }
     };
 
-    // Handle form submission - keep for validation, but onSubmit is now called on change
-    const handleSubmit = (e) => {
+    // Handle save button click
+    const handleSave = (e) => {
         e.preventDefault();
-        // console.log('ProjectsForm - Submitting projects:', projectEntries);
-        // onSubmit(projectEntries);
+        onSubmit(projectEntries);
     };
 
     return (
-        <form onSubmit={handleSubmit} ref={ref}>
-            <h2>Projects</h2>
+        <form onSubmit={handleSave} ref={ref} className="space-y-4">
+            <h2 className="text-2xl font-bold mb-4">Projects</h2>
             
             {/* Map through all project entries */}
             {projectEntries.map((entry) => (
-                <div key={entry.id}>
+                <div key={entry.id} className="space-y-4 p-4 border rounded">
                     {/* Project Name Input */}
-                    <div>
-                        <label>Project Name:</label>
+                    <div className="space-y-2">
+                        <label className="block font-medium">Project Name:</label>
                         <input
                             type="text"
                             value={entry.projectName}
                             onChange={(e) => handleProjectChange(entry.id, 'projectName', e.target.value)}
                             placeholder="Enter project name"
                             required
+                            className="w-full p-2 border rounded"
                         />
                     </div>
 
                     {/* Role Input */}
-                    <div>
-                        <label>Your Role:</label>
+                    <div className="space-y-2">
+                        <label className="block font-medium">Your Role:</label>
                         <input
                             type="text"
                             value={entry.role}
                             onChange={(e) => handleProjectChange(entry.id, 'role', e.target.value)}
                             placeholder="Enter your role in the project"
                             required
+                            className="w-full p-2 border rounded"
                         />
                     </div>
 
                     {/* Project Bullet Points */}
-                    <div>
-                        <label>Project Details & Achievements:</label>
+                    <div className="space-y-2">
+                        <label className="block font-medium">Project Details & Achievements:</label>
                         {entry.bulletPoints.map((bulletPoint, bulletIndex) => (
-                            <div key={bulletIndex} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                            <div key={bulletIndex} className="flex gap-2">
                                 <input
                                     type="text"
                                     value={bulletPoint}
                                     onChange={(e) => handleBulletPointChange(entry.id, bulletIndex, e.target.value)}
                                     placeholder="Enter a bullet point"
-                                    style={{ flex: 1 }}
+                                    className="flex-1 p-2 border rounded"
                                     maxLength={300}
                                 />
                                 {entry.bulletPoints.length > 1 && (
                                     <button
                                         type="button"
                                         onClick={() => removeBulletPoint(entry.id, bulletIndex)}
-                                        style={{ padding: '4px 8px' }}
+                                        className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                                     >
                                         Remove
                                     </button>
@@ -180,55 +164,59 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                         <button
                             type="button"
                             onClick={() => addBulletPoint(entry.id)}
-                            style={{ marginTop: '8px' }}
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                         >
                             Add Bullet Point
                         </button>
                     </div>
 
                     {/* Location Input */}
-                    <div>
-                        <label>Location:</label>
+                    <div className="space-y-2">
+                        <label className="block font-medium">Location:</label>
                         <input
                             type="text"
                             value={entry.location}
                             onChange={(e) => handleProjectChange(entry.id, 'location', e.target.value)}
                             placeholder="Enter project location"
                             required
+                            className="w-full p-2 border rounded"
                         />
                     </div>
 
                     {/* Start Date Input */}
-                    <div>
-                        <label>Start Date:</label>
+                    <div className="space-y-2">
+                        <label className="block font-medium">Start Date:</label>
                         <input
                             type="month"
                             value={entry.startDate}
                             onChange={(e) => handleProjectChange(entry.id, 'startDate', e.target.value)}
                             required
+                            className="w-full p-2 border rounded"
                         />
                     </div>
 
                     {/* Current Project Checkbox */}
-                    <div>
+                    <div className="flex items-center space-x-2">
                         <input
                             type="checkbox"
                             checked={entry.isCurrent}
                             onChange={(e) => handleProjectChange(entry.id, 'isCurrent', e.target.checked)}
+                            className="h-4 w-4"
                         />
                         <label>Currently working on this project</label>
                     </div>
 
                     {/* End Date Input (only show if not current project) */}
                     {!entry.isCurrent && (
-                        <div>
-                            <label>End Date:</label>
+                        <div className="space-y-2">
+                            <label className="block font-medium">End Date:</label>
                             <input
                                 type="month"
                                 value={entry.endDate}
                                 onChange={(e) => handleProjectChange(entry.id, 'endDate', e.target.value)}
                                 min={entry.startDate}
                                 required
+                                className="w-full p-2 border rounded"
                             />
                         </div>
                     )}
@@ -238,6 +226,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                         <button 
                             type="button" 
                             onClick={() => removeProjectEntry(entry.id)}
+                            className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                         >
                             Remove Project
                         </button>
@@ -246,12 +235,21 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             ))}
 
             {/* Add New Project Entry Button */}
-            <button type="button" onClick={addProjectEntry}>
+            <button 
+                type="button" 
+                onClick={addProjectEntry}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
                 Add Another Project
             </button>
 
-            {/* Submit Button */}
-            <button type="submit">Next</button>
+            {/* Save Button */}
+            <button 
+                type="submit"
+                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+                Save Projects
+            </button>
         </form>
     );
 });

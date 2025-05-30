@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { debounce } from './ResumeDisplay';
 
 const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     // State to store all education entries
@@ -14,9 +13,6 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
         }
     ]);
 
-    // Debounce the onSubmit prop
-    const debouncedOnSubmit = React.useCallback(debounce(onSubmit, 300), [onSubmit]);
-
     // Initialize form with initialData if provided
     useEffect(() => {
         if (initialData && initialData.length > 0) {
@@ -26,16 +22,13 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
 
     // Function to handle changes in any education entry
     const handleEducationChange = (id, field, value) => {
-        let newEntries;
-        setEducationEntries(prevEntries => {
-            newEntries = prevEntries.map(entry => 
+        setEducationEntries(prevEntries => 
+            prevEntries.map(entry => 
                 entry.id === id 
                     ? { ...entry, [field]: value }
                     : entry
-            );
-            debouncedOnSubmit(newEntries); // Call debounced onSubmit on change
-            return newEntries;
-        });
+            )
+        );
     };
 
     // Function to add a new education entry
@@ -48,87 +41,82 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             graduationDate: '',
             hasGraduated: false
         };
-        let newEntries;
-        setEducationEntries(prev => {
-            newEntries = [...prev, newEntry];
-            onSubmit(newEntries); // Call onSubmit immediately on adding entry (adding an entry is a discrete action)
-            return newEntries;
-        });
+        setEducationEntries(prev => [...prev, newEntry]);
     };
 
     // Function to remove an education entry
     const removeEducationEntry = (id) => {
         // Don't remove if it's the last entry
         if (educationEntries.length > 1) {
-            let newEntries;
-            setEducationEntries(prev => {
-                newEntries = prev.filter(entry => entry.id !== id);
-                onSubmit(newEntries); // Call onSubmit immediately on removing entry (removing an entry is a discrete action)
-                return newEntries;
-            });
+            setEducationEntries(prev => prev.filter(entry => entry.id !== id));
         }
     };
 
-    // Function to handle form submission - keep for validation, but onSubmit is now called on change
-    const handleSubmit = (e) => {
+    // Function to handle form submission
+    const handleSave = (e) => {
         e.preventDefault();
+        onSubmit(educationEntries);
     };
 
     return (
-        <form onSubmit={handleSubmit} ref={ref}>
-            <h2>Education</h2>
+        <form onSubmit={handleSave} ref={ref} className="space-y-4">
+            <h2 className="text-2xl font-bold mb-4">Education</h2>
             
             {/* Map through all education entries */}
             {educationEntries.map((entry) => (
-                <div key={entry.id}>
+                <div key={entry.id} className="space-y-4 p-4 border rounded">
                     {/* Institution Name Input */}
-                    <div>
-                        <label>College/University Name:</label>
+                    <div className="space-y-2">
+                        <label className="block font-medium">College/University Name:</label>
                         <input
                             type="text"
                             value={entry.institution}
                             onChange={(e) => handleEducationChange(entry.id, 'institution', e.target.value)}
                             placeholder="Enter institution name"
                             required
+                            className="w-full p-2 border rounded"
                         />
                     </div>
 
                     {/* Degree Input */}
-                    <div>
-                        <label>Degree:</label>
+                    <div className="space-y-2">
+                        <label className="block font-medium">Degree:</label>
                         <input
                             type="text"
                             value={entry.degree}
                             onChange={(e) => handleEducationChange(entry.id, 'degree', e.target.value)}
                             placeholder="e.g., Bachelor of Science, Master of Arts"
                             required
+                            className="w-full p-2 border rounded"
                         />
                     </div>
 
                     {/* College Location Input */}
-                    <div>
-                        <label>College Location (City, State):</label>
+                    <div className="space-y-2">
+                        <label className="block font-medium">College Location (City, State):</label>
                         <input
                             type="text"
                             value={entry.location}
                             onChange={(e) => handleEducationChange(entry.id, 'location', e.target.value)}
                             placeholder="e.g., Houston, Texas"
+                            className="w-full p-2 border rounded"
                         />
                     </div>
 
                     {/* Graduation Status Checkbox */}
-                    <div>
+                    <div className="flex items-center space-x-2">
                         <input
                             type="checkbox"
                             checked={entry.hasGraduated}
                             onChange={(e) => handleEducationChange(entry.id, 'hasGraduated', e.target.checked)}
+                            className="h-4 w-4"
                         />
                         <label>I have graduated</label>
                     </div>
 
                     {/* Graduation Date Input */}
-                    <div>
-                        <label>
+                    <div className="space-y-2">
+                        <label className="block font-medium">
                             {entry.hasGraduated ? 'Graduation Date:' : 'Expected Graduation Date:'}
                         </label>
                         <input
@@ -136,6 +124,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             value={entry.graduationDate}
                             onChange={(e) => handleEducationChange(entry.id, 'graduationDate', e.target.value)}
                             required
+                            className="w-full p-2 border rounded"
                         />
                     </div>
 
@@ -144,6 +133,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                         <button 
                             type="button" 
                             onClick={() => removeEducationEntry(entry.id)}
+                            className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                         >
                             Remove
                         </button>
@@ -152,12 +142,21 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             ))}
 
             {/* Add New Education Entry Button */}
-            <button type="button" onClick={addEducationEntry}>
+            <button 
+                type="button" 
+                onClick={addEducationEntry}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
                 Add Another Education
             </button>
 
-            {/* Submit Button */}
-            <button type="submit">Next: Work Experience</button>
+            {/* Save Button */}
+            <button 
+                type="submit"
+                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+                Save Education Information
+            </button>
         </form>
     );
 });

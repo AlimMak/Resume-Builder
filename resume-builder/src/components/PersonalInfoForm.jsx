@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { debounce } from "./ResumeDisplay";
 
 const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     const [inputs, setInputs] = useState(() => {
@@ -23,9 +22,6 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             Phone: initialData.Phone || ''
         } : defaultInputs;
     });
-
-    // Debounce the onSubmit prop
-    const debouncedOnSubmit = React.useCallback(debounce(onSubmit, 300), [onSubmit]);
 
     const [errors, setErrors] = useState({
         FirstName: '',
@@ -52,7 +48,6 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
              }));
         }
     }, [initialData]);
-
 
     const validateInputs = () => {
         let isValid = true;
@@ -116,16 +111,10 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        let newInputs;
-        setInputs(prev => {
-            newInputs = {
-                ...prev,
-                [name]: value
-            };
-            return newInputs;
-        });
-
-        debouncedOnSubmit(newInputs); // Call debounced onSubmit on change
+        setInputs(prev => ({
+            ...prev,
+            [name]: value
+        }));
 
         // will clear the error when typing starts
         if (errors[name]) {
@@ -148,19 +137,15 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             return;
         }
 
-        let newInputs;
         setInputs(prev => {
             const newSocials = prev.socials.map((social, i) => 
                 i === index ? { ...social, [field]: value } : social
             );
-            newInputs = {
+            return {
                 ...prev,
                 socials: newSocials
             };
-            return newInputs;
         });
-
-        onSubmit(newInputs); // Call onSubmit immediately on change
 
         // Clear social errors when typing
         if (errors.socials[index]?.[field]) {
@@ -181,16 +166,10 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
          }
 
         if (inputs.socials.length < 5) {
-            let newInputs;
-            setInputs(prev => {
-                const newSocials = [...prev.socials, { platform: '', url: '' }];
-                newInputs = {
-                    ...prev,
-                    socials: newSocials
-                };
-                return newInputs;
-            });
-            onSubmit(newInputs); // Call onSubmit immediately on adding social
+            setInputs(prev => ({
+                ...prev,
+                socials: [...prev.socials, { platform: '', url: '' }]
+            }));
             setErrors(prev => ({
                 ...prev,
                 socials: [...prev.socials, { platform: '', url: '' }]
@@ -205,24 +184,18 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             return;
         }
 
-        let newInputs;
-        setInputs(prev => {
-            const newSocials = prev.socials.filter((_, i) => i !== index);
-            newInputs = {
-                ...prev,
-                socials: newSocials
-            };
-            return newInputs;
-        });
-        onSubmit(newInputs); // Call onSubmit immediately on removing social
+        setInputs(prev => ({
+            ...prev,
+            socials: prev.socials.filter((_, i) => i !== index)
+        }));
         setErrors(prev => ({
             ...prev,
             socials: prev.socials.filter((_, i) => i !== index) // Also filter errors array
         }));
     };
 
-    // Handle button click
-    const handleSubmit = (e) => {
+    // Handle save button click
+    const handleSave = (e) => {
         e.preventDefault();
         setIsSubmitted(true);
 
@@ -234,7 +207,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} ref={ref} className="space-y-4">
+        <form onSubmit={handleSave} ref={ref} className="space-y-4">
             <h2 className="text-2xl font-bold mb-4">Personal Information</h2>
             
             <div className="space-y-2">
@@ -247,7 +220,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     className="w-full p-2 border rounded"
                 />
                 {errors.FirstName && <div className="text-red-500 text-sm">{errors.FirstName}</div>}
-            </div> 
+            </div>
 
             <div className="space-y-2">
                 <input 
@@ -259,34 +232,18 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     className="w-full p-2 border rounded"
                 />
                 {errors.LastName && <div className="text-red-500 text-sm">{errors.LastName}</div>}
-            </div> 
+            </div>
 
             <div className="space-y-2">
-                <input 
-                    type="text" 
+                <textarea 
                     name="Description" 
                     value={inputs.Description} 
                     onChange={handleInputChange} 
                     placeholder="Enter Description"
                     className="w-full p-2 border rounded"
+                    rows="4"
                 />
                 {errors.Description && <div className="text-red-500 text-sm">{errors.Description}</div>}
-            </div>
-
-            <div className="space-y-2">
-                <label htmlFor="isUSCitizen" className="block text-sm font-medium text-gray-700">US Citizen?</label>
-                <select 
-                    id="isUSCitizen"
-                    name="isUSCitizen"
-                    value={inputs.isUSCitizen}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
-                >
-                    <option value="">Select...</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </select>
-                {errors.isUSCitizen && <div className="text-red-500 text-sm">{errors.isUSCitizen}</div>}
             </div>
 
             <div className="space-y-2">
@@ -295,7 +252,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     name="Email" 
                     value={inputs.Email} 
                     onChange={handleInputChange} 
-                    placeholder="Enter Email Address"
+                    placeholder="Enter Email"
                     className="w-full p-2 border rounded"
                 />
                 {errors.Email && <div className="text-red-500 text-sm">{errors.Email}</div>}
@@ -313,78 +270,71 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                 {errors.Phone && <div className="text-red-500 text-sm">{errors.Phone}</div>}
             </div>
 
-            <div className="space-y-4">
-                <h3 className="text-xl font-semibold">Social Media Links</h3>
-                {/* Add a check here to ensure inputs.socials is an array */}
-                {Array.isArray(inputs.socials) && inputs.socials.map((social, index) => (
-                    <div key={index} className="flex gap-2 items-start">
-                        <div className="flex-1">
-                            {/* Dropdown for platform selection */}
-                            <select
-                                value={social.platform}
-                                onChange={(e) => handleSocialChange(index, 'platform', e.target.value)}
-                                className="w-full p-2 border rounded mb-2"
-                            >
-                                <option value="">Select Platform</option>
-                                <option value="LinkedIn">LinkedIn</option>
-                                <option value="GitHub">GitHub</option>
-                                <option value="Portfolio">Portfolio</option>
-                                {/* Add more relevant platforms as needed */}
-                            </select>
-                            {/* Add a check for errors.socials[index] being defined */}
-                            {errors.socials && errors.socials[index]?.platform && (
-                                <div className="text-red-500 text-sm">{errors.socials[index].platform}</div>
-                            )}
-                        </div>
-                        <div className="flex-1">
-                            <input
-                                type="text"
-                                value={social.url}
-                                onChange={(e) => handleSocialChange(index, 'url', e.target.value)}
-                                placeholder="Username"
-                                className="w-full p-2 border rounded mb-2"
-                            />
-                            {/* Add a check for errors.socials[index] being defined */}
-                            {errors.socials && errors.socials[index]?.url && (
-                                <div className="text-red-500 text-sm">{errors.socials[index].url}</div>
-                            )}
-                        </div>
+            <div className="space-y-2">
+                <select 
+                    name="isUSCitizen" 
+                    value={inputs.isUSCitizen} 
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                >
+                    <option value="">Select US Citizenship Status</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+
+            <div className="space-y-2">
+                <h3 className="font-semibold">Social Media Links</h3>
+                {inputs.socials.map((social, index) => (
+                    <div key={index} className="flex gap-2">
+                        <select
+                            value={social.platform}
+                            onChange={(e) => handleSocialChange(index, 'platform', e.target.value)}
+                            className="flex-1 p-2 border rounded"
+                        >
+                            <option value="">Select Platform</option>
+                            <option value="LinkedIn">LinkedIn</option>
+                            <option value="GitHub">GitHub</option>
+                            <option value="Twitter">Twitter</option>
+                            <option value="Portfolio">Portfolio</option>
+                        </select>
+                        <input
+                            type="text"
+                            value={social.url}
+                            onChange={(e) => handleSocialChange(index, 'url', e.target.value)}
+                            placeholder="Enter URL"
+                            className="flex-1 p-2 border rounded"
+                        />
                         {index > 0 && (
                             <button
                                 type="button"
                                 onClick={() => removeSocial(index)}
-                                className="p-2 text-red-500 hover:text-red-700"
+                                className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                             >
                                 Remove
                             </button>
                         )}
                     </div>
                 ))}
-                
-                {/* Add a check here to ensure inputs.socials is an array */}
-                {Array.isArray(inputs.socials) && inputs.socials.length < 5 && (
+                {inputs.socials.length < 5 && (
                     <button
                         type="button"
                         onClick={addSocial}
-                        className="text-blue-500 hover:text-blue-700"
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                     >
-                        + Add Social Media Link
+                        Add Social Media
                     </button>
                 )}
             </div>
 
-            <button 
+            <button
                 type="submit"
-                className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             >
-                Next: Work Experience
+                Save Personal Information
             </button>
-
-            {isSubmitted && Object.values(errors).every(err => !err) && (
-                <div className="text-green-500">Form submitted successfully!</div>
-            )}
         </form>
-    ); 
+    );
 });
 
 export default PersonalInfoForm;

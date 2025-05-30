@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import ExperienceForm from './ExperienceForm';
-import { debounce } from './ResumeDisplay';
 
 // Same initial structure as before
 const initialExperience = {
@@ -22,9 +20,6 @@ const ExperienceSection = React.forwardRef(({ initialData, onSubmit }, ref) => {
   // State stores an array of experiences
   const [experiences, setExperiences] = useState(initialData || []);
 
-  // Debounce the onSubmit prop
-  const debouncedOnSubmit = React.useCallback(debounce(onSubmit, 300), [onSubmit]);
-
   // Initialize form with initialData if provided
   useEffect(() => {
     if (initialData && initialData.length > 0) {
@@ -37,7 +32,6 @@ const ExperienceSection = React.forwardRef(({ initialData, onSubmit }, ref) => {
     setExperiences(experiences.map(exp => 
       exp.id === id ? updatedExperience : exp // Replace the matching experience
     ));
-    debouncedOnSubmit(experiences.map(exp => exp.id === id ? updatedExperience : exp)); // Debounce onSubmit on change
   };
 
   // Adds a new empty experience
@@ -55,24 +49,22 @@ const ExperienceSection = React.forwardRef(({ initialData, onSubmit }, ref) => {
       // Filter out the experience with matching ID
       const newExperiences = experiences.filter(exp => exp.id !== id);
       setExperiences(newExperiences);
-      onSubmit(newExperiences); // Call onSubmit immediately on removing experience
     } else {
       // If it's the last one, reset it instead
       const newExperiences = [{ ...initialExperience, id: '1' }];
       setExperiences(newExperiences);
-      onSubmit(newExperiences); // Call onSubmit immediately on resetting experience
     }
   };
 
-  // Handle form submission - keep for validation, but onSubmit is now called on change
-  const handleSubmit = (e) => {
+  // Handle save button click
+  const handleSave = (e) => {
     e.preventDefault();
-    // console.log('ExperienceSection - Submitting experiences:', experiences);
+    onSubmit(experiences);
   };
 
   return (
-    <form onSubmit={handleSubmit} ref={ref}>
-      <h2>Work Experience</h2>
+    <form onSubmit={handleSave} ref={ref} className="space-y-4">
+      <h2 className="text-2xl font-bold mb-4">Work Experience</h2>
       
       {/* Render an ExperienceForm for each experience */}
       {experiences.map((experience) => (
@@ -85,12 +77,21 @@ const ExperienceSection = React.forwardRef(({ initialData, onSubmit }, ref) => {
       ))}
       
       {/* Button to add more experiences */}
-      <button type="button" onClick={addNewExperience}>
+      <button 
+        type="button" 
+        onClick={addNewExperience}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
         Add Another Experience
       </button>
 
-      {/* Submit Button */}
-      <button type="submit">Next: Projects</button>
+      {/* Save Button */}
+      <button 
+        type="submit"
+        className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+      >
+        Save Work Experience
+      </button>
     </form>
   );
 });

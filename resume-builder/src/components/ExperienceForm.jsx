@@ -1,5 +1,4 @@
 import React from 'react';
-import { debounce } from './ResumeDisplay';
 
 // This defines what a single job experience looks like
 const initialExperience = {
@@ -17,10 +16,6 @@ const initialExperience = {
 
 // This component displays and manages ONE job experience form
 function ExperienceForm({ experience, onChange, onRemove }) {
-  
-  // Debounce the onChange prop
-  const debouncedOnChange = React.useCallback(debounce(onChange, 300), [onChange]);
-
   // Handles changes to any form field
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -29,11 +24,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
       ...experience,         // Keep existing values
       [name]: type === 'checkbox' ? checked : value // Update changed field
     };
-    if (type === 'text' || type === 'month') {
-      debouncedOnChange(updatedExperience); // Debounce for text and month inputs
-    } else {
-      onChange(updatedExperience); // Call immediately for checkboxes and selects
-    }
+    onChange(updatedExperience);
   };
 
   // Handle changes to a specific bullet point
@@ -44,7 +35,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
       ...experience,
       bulletPoints: newBulletPoints
     };
-    debouncedOnChange(updatedExperience); // Debounce bullet point changes
+    onChange(updatedExperience);
   };
 
   // Add a new empty bullet point
@@ -53,10 +44,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
       ...experience,
       bulletPoints: [...experience.bulletPoints, '']
     };
-    // Defer the state update to avoid render-related issues
-    setTimeout(() => {
-      onChange(updatedExperience); 
-    }, 0);
+    onChange(updatedExperience);
   };
 
   // Remove a bullet point by index
@@ -66,53 +54,61 @@ function ExperienceForm({ experience, onChange, onRemove }) {
       ...experience,
       bulletPoints: newBulletPoints
     };
-    onChange(updatedExperience); // Call immediately for removing bullet point
+    onChange(updatedExperience);
   };
 
   return (
-    <div>
+    <div className="space-y-4 p-4 border rounded">
       {/* Company Name Field */}
-      <div>
-        <label>Company Name</label>
+      <div className="space-y-2">
+        <label className="block font-medium">Company Name</label>
         <input
           type="text"
           name="company"
           value={experience.company}
           onChange={handleChange}
           required
+          className="w-full p-2 border rounded"
         />
       </div>
       
       {/* Position Title Field */}
-      <div>
-        <label>Position Title</label>
+      <div className="space-y-2">
+        <label className="block font-medium">Position Title</label>
         <input
           type="text"
           name="position"
           value={experience.position}
           onChange={handleChange}
           required
+          className="w-full p-2 border rounded"
         />
       </div>
       
       {/* Start Date Field */}
-      <div>
-        <label>Start Date</label>
+      <div className="space-y-2">
+        <label className="block font-medium">Start Date</label>
         <input
           type="month"  // Special input for month/year
           name="startDate"
           value={experience.startDate}
           onChange={handleChange}
           required
+          className="w-full p-2 border rounded"
         />
       </div>
       
       {/* Conditional End Date Field */}
-      <div>
-        <label>End Date</label>
+      <div className="space-y-2">
+        <label className="block font-medium">End Date</label>
         {experience.current ? (
           // Shows "Present" if current job
-          <input type="text" value="Present" disabled />
+          <input 
+            type="text" 
+            value="Present" 
+            disabled 
+            className="w-full p-2 border rounded bg-gray-100"
+          />
         ) : (
           // Shows date picker if not current job
           <input
@@ -121,52 +117,57 @@ function ExperienceForm({ experience, onChange, onRemove }) {
             value={experience.endDate}
             onChange={handleChange}
             min={experience.startDate} // Can't end before start
+            className="w-full p-2 border rounded"
           />
         )}
       </div>
       
       {/* Current Job Checkbox */}
-      <div>
+      <div className="flex items-center space-x-2">
         <input
           type="checkbox"
           name="current"
           checked={experience.current}
           onChange={handleChange}
+          className="h-4 w-4"
         />
         <label>I currently work here</label>
       </div>
       
       {/* Remote Job Checkbox */}
-      <div>
+      <div className="flex items-center space-x-2">
         <input
           type="checkbox"
           name="remote"
           checked={experience.remote}
           onChange={handleChange}
+          className="h-4 w-4"
         />
         <label>Remote Position</label>
       </div>
       
       {/* Location Field (only shows if not remote) */}
       {!experience.remote && (
-        <div>
-          <label>Location</label>
+        <div className="space-y-2">
+          <label className="block font-medium">Location</label>
           <input
             type="text"
             name="location"
             value={experience.location}
             onChange={handleChange}
+            className="w-full p-2 border rounded"
           />
         </div>
       )}
       
       {/* Job Type Dropdown */}
-      <div>
-        <label>Employment Type</label>
+      <div className="space-y-2">
+        <label className="block font-medium">Employment Type</label>
         <select
           name="employmentType"
           value={experience.employmentType}
           onChange={handleChange}
+          className="w-full p-2 border rounded"
         >
           <option value="full-time">Full-time</option>
           <option value="part-time">Part-time</option>
@@ -175,17 +176,17 @@ function ExperienceForm({ experience, onChange, onRemove }) {
       </div>
       
       {/* Bullet Points Section */}
-      <div>
-        <label>Responsibilities & Achievements</label>
+      <div className="space-y-2">
+        <label className="block font-medium">Responsibilities & Achievements</label>
         {/* Map over bulletPoints array to render input for each */}
         {experience.bulletPoints.map((bulletPoint, index) => (
-          <div key={index} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+          <div key={index} className="flex gap-2">
             <input
               type="text"
               value={bulletPoint}
               onChange={(e) => handleBulletPointChange(index, e.target.value)}
               placeholder="Enter a bullet point"
-              style={{ flex: 1 }}
+              className="flex-1 p-2 border rounded"
               maxLength={300}
             />
             {/* Show remove button only if there is more than one bullet point */}
@@ -193,7 +194,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
               <button
                 type="button"
                 onClick={() => handleRemoveBulletPoint(index)}
-                style={{ padding: '4px 8px' }}
+                className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Remove
               </button>
@@ -204,14 +205,18 @@ function ExperienceForm({ experience, onChange, onRemove }) {
         <button
           type="button"
           onClick={handleAddBulletPoint}
-          style={{ marginTop: '8px' }}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Add Bullet Point
         </button>
       </div>
       
       {/* Remove Button */}
-      <button type="button" onClick={onRemove}>
+      <button 
+        type="button" 
+        onClick={onRemove}
+        className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+      >
         Remove Experience
       </button>
     </div>
