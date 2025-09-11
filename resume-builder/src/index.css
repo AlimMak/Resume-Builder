@@ -1,0 +1,12 @@
+/* Tailwind CSS entrypoint for v4 via the Vite plugin. This ensures utility classes render. */
+@import "tailwindcss";
+
+/* Ensure pointer cursor on all button-like controls */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+a[role="button"] {
+  cursor: pointer;
+}
+

@@ -1,5 +1,9 @@
+/**
+ * ResumeDocument generates a PDF representation of the resume using @react-pdf/renderer.
+ * Keep styling minimal and consistent with the on-screen preview.
+ */
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 // Helper function to format date from MM-YYYY to Month YYYY
 const formatDate = (dateString) => {
@@ -159,7 +163,7 @@ const ResumeDocument = ({ formData }) => (
               </View>
               {/* Degree/Field on the left, Graduation on the right */}
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={[styles.text, { fontStyle: 'italic' }]}>{edu.degree} {edu.field}</Text>
+                <Text style={[styles.text, { fontStyle: 'italic' }]}>{edu.degree}</Text>
                 <Text style={[styles.text, { fontStyle: 'italic', fontWeight: 'bold' }]}>{edu.hasGraduated ? 'Graduated' : 'Expected Graduation'}, {formatDate(edu.graduationDate)}</Text>
               </View>
             </View>

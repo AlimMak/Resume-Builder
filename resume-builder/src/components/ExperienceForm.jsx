@@ -1,18 +1,9 @@
 import React from 'react';
 
-// This defines what a single job experience looks like
-const initialExperience = {
-  id: '',         // Unique identifier for each experience
-  company: '',    // Company name
-  position: '',   // Job title
-  startDate: '',  // When the job started
-  endDate: '',    // When the job ended
-  current: false, // Is this a current job?
-  bulletPoints: [''], // Changed from description to an array of bullet points
-  location: '',   // Physical location
-  remote: false,  // Is this a remote job?
-  employmentType: 'full-time' // Job type
-};
+/**
+ * ExperienceForm renders a single work experience editor and notifies parent on changes.
+ * This component is controlled by its parent via `experience` and `onChange` props.
+ */
 
 // This component displays and manages ONE job experience form
 function ExperienceForm({ experience, onChange, onRemove }) {
