@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useToast } from './ToastProvider';
+import { logger } from '../utils/logger';
 
 const initialProject = {
     id: '', // Unique identifier
@@ -13,6 +15,8 @@ const initialProject = {
 
 const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     const [projectEntries, setProjectEntries] = useState(initialData || []);
+    const toast = useToast();
+    const dragIndexRef = useRef(null);
 
     // Initialize form with initialData if provided
     useEffect(() => {
@@ -89,12 +93,14 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     const addProjectEntry = () => {
         const newEntry = { ...initialProject, id: Date.now().toString() };
         setProjectEntries(prev => [...prev, newEntry]);
+        logger.info('Project added', { id: newEntry.id });
     };
 
     // Function to remove a project entry
     const removeProjectEntry = (id) => {
         if (projectEntries.length > 1) {
             setProjectEntries(prev => prev.filter(entry => entry.id !== id));
+            logger.warn('Project removed', { id });
         }
     };
 
@@ -102,6 +108,33 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     const handleSave = (e) => {
         e.preventDefault();
         onSubmit(projectEntries);
+        toast.success('Saved projects');
+    };
+
+    // Basic DnD reordering for projects
+    const moveProject = (fromIndex, toIndex) => {
+        setProjectEntries(prev => {
+            const next = [...prev];
+            const [moved] = next.splice(fromIndex, 1);
+            next.splice(toIndex, 0, moved);
+            logger.info('Project reordered', { fromIndex, toIndex, id: moved?.id });
+            return next;
+        });
+    };
+    const onDragStart = (index) => (e) => {
+        dragIndexRef.current = index;
+        e.dataTransfer.effectAllowed = 'move';
+    };
+    const onDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+    const onDrop = (index) => (e) => {
+        e.preventDefault();
+        const from = dragIndexRef.current;
+        if (from === null || from === index) return;
+        moveProject(from, index);
+        dragIndexRef.current = null;
     };
 
     return (
@@ -109,8 +142,9 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             <h2 className="text-2xl font-bold mb-4">Projects</h2>
             
             {/* Map through all project entries */}
-            {projectEntries.map((entry) => (
-                <div key={entry.id} className="space-y-4 p-4 border rounded">
+            {projectEntries.map((entry, index) => (
+                <div key={entry.id} className="space-y-4 p-4 border rounded" draggable onDragStart={onDragStart(index)} onDragOver={onDragOver} onDrop={onDrop(index)}>
+                    <div className="text-sm text-gray-500">Drag handle ▤</div>
                     {/* Project Name Input */}
                     <div className="space-y-2">
                         <label className="block font-medium">Project Name:</label>
@@ -238,7 +272,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             <button 
                 type="button" 
                 onClick={addProjectEntry}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hover-glow-primary transition-base"
             >
                 Add Another Project
             </button>
@@ -246,7 +280,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             {/* Save Button */}
             <button 
                 type="submit"
-                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 hover-glow-emerald transition-base"
             >
                 Save Projects
             </button>

@@ -37,29 +37,30 @@ export function debounce(func, delay) {
 // Styles object for the preview - Ensuring correct React inline style format
 const styles = {
   container: {
+    // Constrain width to printable size and center content
     maxWidth: '8.5in',
     margin: '0 auto',
-    padding: '20px',
+    padding: '24px',
     fontFamily: 'Times New Roman, Times, serif',
-    backgroundColor: '#ffffff',
+    backgroundColor: 'transparent',
   },
   navigation: {
     display: 'flex',
     justifyContent: 'space-between',
-    marginBottom: '20px',
+    marginBottom: '16px',
   },
   personalInfoContainer: {
     textAlign: 'center',
-    marginBottom: '4px',
+    marginBottom: '6px',
   },
   nameHeading: {
-    fontSize: '16pt',
+    fontSize: '18pt',
     fontWeight: 'bold',
-    marginBottom: '3px',
+    marginBottom: '4px',
   },
   inlineText: {
     fontSize: '10.5pt',
-    marginBottom: '3px',
+    marginBottom: '4px',
     display: 'flex',
     justifyContent: 'center',
     gap: '5px',
@@ -73,12 +74,12 @@ const styles = {
     textAlign: 'center',
   },
   section: {
-    marginBottom: '8px',
+    marginBottom: '10px',
   },
   heading: {
     fontSize: '12pt',
     fontWeight: 'bold',
-    marginBottom: '3px',
+    marginBottom: '4px',
     borderBottom: '1px solid #000',
     paddingBottom: '1px',
   },
@@ -89,12 +90,14 @@ const styles = {
   },
   text: {
     fontSize: '10.5pt',
-    marginBottom: '1px',
+    lineHeight: 1.35,
+    marginBottom: '2px',
   },
   bulletPoint: {
     fontSize: '10.5pt',
-    marginBottom: '1px',
-    marginLeft: '10px',
+    lineHeight: 1.35,
+    marginBottom: '2px',
+    marginLeft: '12px',
   },
   row: {
     display: 'flex',
@@ -114,10 +117,13 @@ const styles = {
     fontWeight: 'bold',
   },
   pagePreview: {
-    border: '1px solid #000', // Black border
-    boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.2)', // Subtle shadow
-    padding: '20px', // Add some padding inside the border
-    backgroundColor: '#fff', // Ensure background is white
+    // Ensure the resume surface is always high-contrast and readable in dark mode
+    border: '1px solid #e5e7eb', // Light border
+    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)', // Subtle shadow
+    padding: '28px', // Comfortable internal padding
+    backgroundColor: '#ffffff', // Paper white
+    color: '#0b0f19', // Stronger dark text for light mode
+    borderRadius: '8px',
   },
   highlightedSection: {
     backgroundColor: '#f0f0f0', // Light grey background for highlighting

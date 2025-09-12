@@ -12,7 +12,7 @@ form {
 }
 
 h2 {
-  color: #333;
+  color: #111827; /* Improve contrast in light mode */
   margin-bottom: 20px;
 }
 
@@ -39,7 +39,7 @@ textarea {
 
 button {
   background-color: #dc3545;
-  color: white;
+  color: #ffffff;
   border: none;
   padding: 8px 16px;
   border-radius: 4px;

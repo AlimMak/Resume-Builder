@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useToast } from './ToastProvider';
+import { logger } from '../utils/logger';
 
 const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     const [inputs, setInputs] = useState(() => {
@@ -34,6 +36,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     });
 
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const toast = useToast();
 
     // useEffect to update state if initialData changes after initial render
     useEffect(() => {
@@ -202,7 +205,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
         if (validateInputs()) {
             onSubmit(inputs);
         } else {
-            console.log('Form has errors');
+            logger.warn('Personal info validation failed');
         }
     };
 
@@ -329,7 +332,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
 
             <button
                 type="submit"
-                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 hover-glow-emerald transition-base"
             >
                 Save Personal Information
             </button>

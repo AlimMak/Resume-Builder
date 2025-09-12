@@ -10,3 +10,80 @@ a[role="button"] {
   cursor: pointer;
 }
 
+/*
+ * Global focus-visible styles for accessibility
+ * Emphasize focus states on all interactive controls
+ */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary, #2563eb);
+  outline-offset: 2px;
+}
+
+/*
+ * Theme tokens: light and dark via data-theme on <html>
+ * Minimal variables to ensure app remains legible in both modes
+ */
+:root {
+  --bg: #ffffff;
+  --text: #0b0f19; /* strong neutral for light mode */
+  --panel: #f5f5f5;
+  --border: #dddddd;
+  --primary: #2563eb;
+  --success: #16a34a;
+  --danger: #dc3545;
+  --bg2: #f3f4f6; /* secondary background for gradients */
+}
+
+html[data-theme='dark'] {
+  --bg: #0b0f19;
+  --text: #e5e7eb;
+  --panel: #111827;
+  --border: #374151;
+  --primary: #3b82f6;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --bg2: #0a0f1a;
+}
+
+/* Apply base colors */
+body {
+  background: var(--bg);
+  color: var(--text);
+  /* Ensure Tailwind text utilities render at full opacity by default */
+  --tw-text-opacity: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* App gradient using theme variables */
+.app-gradient {
+  background: linear-gradient(to bottom, var(--bg), var(--bg2));
+}
+
+/*
+ * Hover and glow utilities
+ */
+.hover-elevate:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.hover-glow-primary:hover {
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15), 0 8px 24px rgba(37,99,235,0.15);
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.hover-glow-emerald:hover {
+  box-shadow: 0 0 0 2px rgba(16,185,129,0.15), 0 8px 24px rgba(16,185,129,0.18);
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.transition-base {
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+

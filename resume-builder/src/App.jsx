@@ -3,6 +3,9 @@
  * State is intentionally minimal to keep routing logic straightforward.
  */
 import { useState } from 'react'
+import ErrorBoundary from './components/ErrorBoundary'
+import { ToastProvider } from './components/ToastProvider'
+import ThemeToggle from './components/ThemeToggle'
 import HomePage from './components/HomePage'
 import ResumeBuilderPage from './components/ResumeBuilderPage'
 import { parseResumeFile } from './utils/parseResumeFile'
@@ -14,34 +17,42 @@ function App() {
 
   // Show different pages based on what the user wants to see
   return (
-    <div>
-      {currentPage === 'home' ? (
-        // Show the home page
-        <HomePage 
-          onStartForm={() => setCurrentPage('resumeBuilder')}
-          onViewResume={() => setCurrentPage('resumeBuilder')}
-          onImportResume={async (file) => {
-            try {
-              logger.info('Starting import flow', { fileName: file.name, fileType: file.type, fileSize: file.size });
-              const parsed = await parseResumeFile(file);
-              logger.info('Parsed resume file', { sections: Object.keys(parsed) });
-              const existing = localStorage.getItem('resumeData');
-              const merged = { ...(existing ? JSON.parse(existing) : {}), ...parsed };
-              localStorage.setItem('resumeData', JSON.stringify(merged));
-              setCurrentPage('resumeBuilder');
-            } catch (err) {
-              logger.error('Import failed', { error: err?.message });
-              alert('Failed to import resume. Please try a different file or format.');
-            }
-          }}
-        />
-      ) : (
-        // Show the Resume Builder Page
-        <ResumeBuilderPage 
-          onGoHome={() => setCurrentPage('home')}
-        />
-      )}
-    </div>
+    <ToastProvider>
+      <ErrorBoundary>
+        <div className="app-gradient min-h-screen">
+          {/* App header controls */}
+          <div style={{ position: 'fixed', top: 8, right: 8, zIndex: 50 }}>
+            <ThemeToggle />
+          </div>
+          {currentPage === 'home' ? (
+            // Show the home page
+            <HomePage 
+              onStartForm={() => setCurrentPage('resumeBuilder')}
+              onViewResume={() => setCurrentPage('resumeBuilder')}
+              onImportResume={async (file) => {
+                try {
+                  logger.info('Starting import flow', { fileName: file.name, fileType: file.type, fileSize: file.size });
+                  const parsed = await parseResumeFile(file);
+                  logger.info('Parsed resume file', { sections: Object.keys(parsed) });
+                  const existing = localStorage.getItem('resumeData');
+                  const merged = { ...(existing ? JSON.parse(existing) : {}), ...parsed };
+                  localStorage.setItem('resumeData', JSON.stringify(merged));
+                  setCurrentPage('resumeBuilder');
+                } catch (err) {
+                  logger.error('Import failed', { error: err?.message });
+                  alert('Failed to import resume. Please try a different file or format.');
+                }
+              }}
+            />
+          ) : (
+            // Show the Resume Builder Page
+            <ResumeBuilderPage 
+              onGoHome={() => setCurrentPage('home')}
+            />
+          )}
+        </div>
+      </ErrorBoundary>
+    </ToastProvider>
   );
 }
 

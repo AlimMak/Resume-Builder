@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
+import { logger } from '../utils/logger';
 
 const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     // State to store all education entries
@@ -12,6 +14,8 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             hasGraduated: false
         }
     ]);
+
+    const toast = useToast();
 
     // Initialize form with initialData if provided
     useEffect(() => {
@@ -42,6 +46,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             hasGraduated: false
         };
         setEducationEntries(prev => [...prev, newEntry]);
+        logger.info('Education added', { id: newEntry.id });
     };
 
     // Function to remove an education entry
@@ -49,6 +54,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
         // Don't remove if it's the last entry
         if (educationEntries.length > 1) {
             setEducationEntries(prev => prev.filter(entry => entry.id !== id));
+            logger.warn('Education removed', { id });
         }
     };
 
@@ -56,6 +62,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     const handleSave = (e) => {
         e.preventDefault();
         onSubmit(educationEntries);
+        toast.success('Saved education');
     };
 
     return (
