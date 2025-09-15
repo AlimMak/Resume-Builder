@@ -81,65 +81,81 @@ function ManageResumesPage({ onGoHome, onOpenResume }) {
 
   return (
     <div className="min-h-screen app-gradient">
-      <div className="max-w-4xl mx-auto px-4 pt-16 pb-10">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Manage Resumes</h1>
-          <div className="flex gap-2">
-            <button onClick={onGoHome} className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700">Home</button>
+      <div className="max-w-5xl mx-auto px-4 pt-16 pb-14">
+        {/* Header with subtle gradient and glow */}
+        <div className="mb-6 rounded-2xl bg-gradient-to-r from-blue-600/20 via-indigo-600/10 to-emerald-600/20 p-1 shadow-lg">
+          <div className="flex items-center justify-between rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur px-5 py-4 ring-1 ring-black/5">
+            <div>
+              <h1 className="text-2xl font-extrabold tracking-tight">Manage Resumes</h1>
+              <p className="text-sm opacity-80">Organize, rename, duplicate, download, and open your resumes.</p>
+            </div>
+            <button
+              onClick={onGoHome}
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-gray-700 to-gray-800 text-white shadow hover:shadow-xl transition-base focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+            >
+              Home
+            </button>
           </div>
         </div>
 
-        {resumes.length === 0 ? (
-          <div className="p-4 border rounded bg-white dark:bg-gray-900">No resumes yet. Create one from Home.</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full border">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-gray-800">
-                  <th className="text-left p-2 border">Name</th>
-                  <th className="text-left p-2 border">Updated</th>
-                  <th className="text-left p-2 border">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {resumes.map((r) => (
-                  <tr key={r.id} className="border-b">
-                    <td className="p-2 border">
-                      {renamingId === r.id ? (
-                        <div className="flex gap-2">
-                          <input value={newName} onChange={(e) => setNewName(e.target.value)} className="p-2 border rounded flex-1" placeholder={r.name} />
-                          <button onClick={() => handleRename(r.id)} className="px-3 py-2 bg-green-600 text-white rounded">Save</button>
-                          <button onClick={() => { setRenamingId(null); setNewName(''); }} className="px-3 py-2 bg-gray-500 text-white rounded">Cancel</button>
-                        </div>
-                      ) : (
-                        <span>{r.name}</span>
-                      )}
-                    </td>
-                    <td className="p-2 border">{r.updatedAt ? new Date(r.updatedAt).toLocaleString() : ''}</td>
-                    <td className="p-2 border">
-                      <div className="flex flex-wrap gap-2">
-                        <button onClick={() => onOpenResume(r.id)} className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Open</button>
-                        {renamingId !== r.id && (
-                          <button onClick={() => { setRenamingId(r.id); setNewName(r.name); }} className="px-3 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Rename</button>
-                        )}
-                        <button onClick={() => handleDuplicate(r.id)} className="px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Save As</button>
-                        {/* Direct PDF download using @react-pdf/renderer */}
-                        <PDFDownloadLink document={<ResumeDocument formData={r.data} />} fileName={`${(r.name || 'resume')}.pdf`}>
-                          {({ loading }) => (
-                            <button disabled={loading} className={`px-3 py-2 text-white rounded ${loading ? 'bg-gray-400 cursor-wait' : 'bg-gray-700 hover:bg-gray-800'}`}>
-                              {loading ? 'Preparing…' : 'Download PDF'}
-                            </button>
-                          )}
-                        </PDFDownloadLink>
-                        <button onClick={() => handleDelete(r.id)} className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
-                      </div>
-                    </td>
+        {/* Card container for table */}
+        <div className="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur shadow-2xl ring-1 ring-black/5 p-4">
+          {resumes.length === 0 ? (
+            <div className="p-8 text-center border-2 border-dashed rounded-xl bg-white/60 dark:bg-gray-900/40">
+              <div className="text-5xl mb-3">📝</div>
+              <div className="font-medium">No resumes yet</div>
+              <div className="text-sm opacity-80">Create one from the Home page to get started.</div>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                    <th className="text-left p-3">Name</th>
+                    <th className="text-left p-3">Updated</th>
+                    <th className="text-left p-3">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                  {resumes.map((r) => (
+                    <tr key={r.id} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/60 transition-base">
+                      <td className="p-3 align-middle">
+                        {renamingId === r.id ? (
+                          <div className="flex gap-2">
+                            <input value={newName} onChange={(e) => setNewName(e.target.value)} className="flex-1 p-2 border rounded-lg bg-white/80 dark:bg-gray-900/70" placeholder={r.name} />
+                            <button onClick={() => handleRename(r.id)} className="px-3 py-2 rounded-full bg-emerald-600 text-white shadow hover:shadow-xl hover-glow-emerald transition-base">Save</button>
+                            <button onClick={() => { setRenamingId(null); setNewName(''); }} className="px-3 py-2 rounded-full bg-gray-500 text-white shadow hover:shadow-xl transition-base">Cancel</button>
+                          </div>
+                        ) : (
+                          <span className="font-medium">{r.name}</span>
+                        )}
+                      </td>
+                      <td className="p-3 align-middle opacity-80">{r.updatedAt ? new Date(r.updatedAt).toLocaleString() : ''}</td>
+                      <td className="p-3 align-middle">
+                        {/* Action buttons: rounded pills with soft glow */}
+                        <div className="flex flex-wrap gap-2">
+                          <button onClick={() => onOpenResume(r.id)} className="px-3 py-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow hover:shadow-xl hover-glow-primary transition-base">Open</button>
+                          {renamingId !== r.id && (
+                            <button onClick={() => { setRenamingId(r.id); setNewName(r.name); }} className="px-3 py-2 rounded-full bg-amber-500 text-white shadow hover:shadow-xl transition-base">Rename</button>
+                          )}
+                          <button onClick={() => handleDuplicate(r.id)} className="px-3 py-2 rounded-full bg-emerald-600 text-white shadow hover:shadow-xl hover-glow-emerald transition-base">Save As</button>
+                          <PDFDownloadLink document={<ResumeDocument formData={r.data} />} fileName={`${(r.name || 'resume')}.pdf`}>
+                            {({ loading }) => (
+                              <button disabled={loading} className={`px-3 py-2 rounded-full text-white shadow transition-base ${loading ? 'bg-gray-400 cursor-wait' : 'bg-gray-700 hover:shadow-xl hover:bg-gray-800'}`}>
+                                {loading ? 'Preparing…' : 'Download PDF'}
+                              </button>
+                            )}
+                          </PDFDownloadLink>
+                          <button onClick={() => handleDelete(r.id)} className="px-3 py-2 rounded-full bg-red-600 text-white shadow hover:shadow-xl transition-base">Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
