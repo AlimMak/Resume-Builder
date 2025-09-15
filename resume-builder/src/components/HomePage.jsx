@@ -7,22 +7,8 @@ import React, { useRef } from 'react';
  * Styling focuses on clear call-to-action buttons centered on the page
  * so users can immediately see where to click.
  */
-function HomePage({ onStartForm, onViewResume, onImportResume }) {
+function HomePage({ onStartForm, onManageResumes }) {
     const fileInputRef = useRef(null);
-
-    // Trigger hidden file input click
-    const handleImportClick = () => {
-        fileInputRef.current?.click();
-    };
-
-    // Handle file selection and propagate to parent
-    const handleFileChange = (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        onImportResume?.(file);
-        // reset input so user can re-select same file
-        e.target.value = '';
-    };
     return (
         <div className="min-h-screen app-gradient">
             <div className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -49,27 +35,13 @@ function HomePage({ onStartForm, onViewResume, onImportResume }) {
                     >
                         Create New Resume
                     </button>
-                    {/* Button to view existing resume */}
+                    {/* Button to manage existing resumes */}
                     <button 
-                        onClick={onViewResume}
+                        onClick={onManageResumes}
                         className="px-6 py-3 rounded-lg bg-gray-700 text-white shadow hover:bg-gray-800 hover-elevate transition-base focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                     >
-                        View Resume
+                        Manage Resumes
                     </button>
-                    {/* Button to import existing resume */}
-                    <button 
-                        onClick={handleImportClick}
-                        className="px-6 py-3 rounded-lg bg-emerald-600 text-white shadow hover:bg-emerald-700 hover-glow-emerald transition-base focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
-                    >
-                        Import Resume
-                    </button>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".pdf,.docx,.txt"
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
-                    />
                 </div>
             </div>
         </div>

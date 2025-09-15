@@ -131,7 +131,7 @@ const styles = {
   },
 };
 
-function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onSectionClick, onSectionHover, hoveredSection }) {
+function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onSectionClick, onSectionHover, hoveredSection, resumeName }) {
     const socials = formData?.personalInfo?.socials || [];
     const targetRef = useRef();
 
@@ -159,7 +159,7 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onS
                       Home
                     </button>
                     {/* Render PDF download as a styled button with loading state */}
-                    <PDFDownloadLink document={<ResumeDocument formData={formData} />} fileName="resume.pdf">
+                    <PDFDownloadLink document={<ResumeDocument formData={formData} />} fileName={`${(resumeName || 'resume')}.pdf`}>
                         {({ loading }) => (
                           <button
                             disabled={loading}
