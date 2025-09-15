@@ -220,7 +220,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     value={inputs.FirstName} 
                     onChange={handleInputChange} 
                     placeholder="Enter First Name"
-                    className="w-full p-2 border rounded"
+                    className="w-full input-glass"
                 />
                 {errors.FirstName && <div className="text-red-500 text-sm">{errors.FirstName}</div>}
             </div>
@@ -232,7 +232,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     value={inputs.LastName} 
                     onChange={handleInputChange} 
                     placeholder="Enter Last Name"
-                    className="w-full p-2 border rounded"
+                    className="w-full input-glass"
                 />
                 {errors.LastName && <div className="text-red-500 text-sm">{errors.LastName}</div>}
             </div>
@@ -243,7 +243,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     value={inputs.Description} 
                     onChange={handleInputChange} 
                     placeholder="Enter Description"
-                    className="w-full p-2 border rounded"
+                    className="w-full input-glass"
                     rows="4"
                 />
                 {errors.Description && <div className="text-red-500 text-sm">{errors.Description}</div>}
@@ -256,7 +256,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     value={inputs.Email} 
                     onChange={handleInputChange} 
                     placeholder="Enter Email"
-                    className="w-full p-2 border rounded"
+                    className="w-full input-glass"
                 />
                 {errors.Email && <div className="text-red-500 text-sm">{errors.Email}</div>}
             </div>
@@ -268,7 +268,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     value={inputs.Phone} 
                     onChange={handleInputChange} 
                     placeholder="Enter Phone Number"
-                    className="w-full p-2 border rounded"
+                    className="w-full input-glass"
                 />
                 {errors.Phone && <div className="text-red-500 text-sm">{errors.Phone}</div>}
             </div>
@@ -278,7 +278,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     name="isUSCitizen" 
                     value={inputs.isUSCitizen} 
                     onChange={handleInputChange}
-                    className="w-full p-2 border rounded"
+                    className="w-full input-glass"
                 >
                     <option value="">Select US Citizenship Status</option>
                     <option value="Yes">Yes</option>
@@ -293,7 +293,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                         <select
                             value={social.platform}
                             onChange={(e) => handleSocialChange(index, 'platform', e.target.value)}
-                            className="flex-1 p-2 border rounded"
+                            className="flex-1 input-glass"
                         >
                             <option value="">Select Platform</option>
                             <option value="LinkedIn">LinkedIn</option>
@@ -306,13 +306,13 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             value={social.url}
                             onChange={(e) => handleSocialChange(index, 'url', e.target.value)}
                             placeholder="Enter URL"
-                            className="flex-1 p-2 border rounded"
+                            className="flex-1 input-glass"
                         />
                         {index > 0 && (
                             <button
                                 type="button"
                                 onClick={() => removeSocial(index)}
-                                className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                className="pill-btn pill-danger"
                             >
                                 Remove
                             </button>
@@ -323,7 +323,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     <button
                         type="button"
                         onClick={addSocial}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        className="pill-btn pill-primary"
                     >
                         Add Social Media
                     </button>
@@ -332,7 +332,7 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
 
             <button
                 type="submit"
-                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 hover-glow-emerald transition-base"
+                className="w-full pill-btn pill-success"
             >
                 Save Personal Information
             </button>

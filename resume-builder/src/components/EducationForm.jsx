@@ -81,7 +81,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             onChange={(e) => handleEducationChange(entry.id, 'institution', e.target.value)}
                             placeholder="Enter institution name"
                             required
-                            className="w-full p-2 border rounded"
+                            className="w-full input-glass"
                         />
                     </div>
 
@@ -94,7 +94,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             onChange={(e) => handleEducationChange(entry.id, 'degree', e.target.value)}
                             placeholder="e.g., Bachelor of Science, Master of Arts"
                             required
-                            className="w-full p-2 border rounded"
+                            className="w-full input-glass"
                         />
                     </div>
 
@@ -106,7 +106,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             value={entry.location}
                             onChange={(e) => handleEducationChange(entry.id, 'location', e.target.value)}
                             placeholder="e.g., Houston, Texas"
-                            className="w-full p-2 border rounded"
+                            className="w-full input-glass"
                         />
                     </div>
 
@@ -131,7 +131,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             value={entry.graduationDate}
                             onChange={(e) => handleEducationChange(entry.id, 'graduationDate', e.target.value)}
                             required
-                            className="w-full p-2 border rounded"
+                            className="w-full input-glass"
                         />
                     </div>
 
@@ -140,7 +140,7 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                         <button 
                             type="button" 
                             onClick={() => removeEducationEntry(entry.id)}
-                            className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                            className="pill-btn pill-danger"
                         >
                             Remove
                         </button>

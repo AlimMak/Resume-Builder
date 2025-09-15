@@ -59,7 +59,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
           value={experience.company}
           onChange={handleChange}
           required
-          className="w-full p-2 border rounded"
+          className="w-full input-glass"
         />
       </div>
       
@@ -72,7 +72,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
           value={experience.position}
           onChange={handleChange}
           required
-          className="w-full p-2 border rounded"
+          className="w-full input-glass"
         />
       </div>
       
@@ -85,7 +85,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
           value={experience.startDate}
           onChange={handleChange}
           required
-          className="w-full p-2 border rounded"
+          className="w-full input-glass"
         />
       </div>
       
@@ -98,7 +98,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
             type="text" 
             value="Present" 
             disabled 
-            className="w-full p-2 border rounded bg-gray-100"
+            className="w-full input-glass bg-gray-100"
           />
         ) : (
           // Shows date picker if not current job
@@ -108,7 +108,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
             value={experience.endDate}
             onChange={handleChange}
             min={experience.startDate} // Can't end before start
-            className="w-full p-2 border rounded"
+            className="w-full input-glass"
           />
         )}
       </div>
@@ -146,7 +146,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
             name="location"
             value={experience.location}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full input-glass"
           />
         </div>
       )}
@@ -158,7 +158,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
           name="employmentType"
           value={experience.employmentType}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className="w-full input-glass"
         >
           <option value="full-time">Full-time</option>
           <option value="part-time">Part-time</option>
@@ -177,7 +177,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
               value={bulletPoint}
               onChange={(e) => handleBulletPointChange(index, e.target.value)}
               placeholder="Enter a bullet point"
-              className="flex-1 p-2 border rounded"
+              className="flex-1 input-glass"
               maxLength={300}
             />
             {/* Show remove button only if there is more than one bullet point */}
@@ -185,7 +185,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
               <button
                 type="button"
                 onClick={() => handleRemoveBulletPoint(index)}
-                className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="pill-btn pill-danger"
               >
                 Remove
               </button>
@@ -196,7 +196,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
         <button
           type="button"
           onClick={handleAddBulletPoint}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="pill-btn pill-primary"
         >
           Add Bullet Point
         </button>
@@ -206,7 +206,7 @@ function ExperienceForm({ experience, onChange, onRemove }) {
       <button 
         type="button" 
         onClick={onRemove}
-        className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        className="w-full pill-btn pill-danger"
       >
         Remove Experience
       </button>

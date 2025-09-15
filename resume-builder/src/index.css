@@ -87,3 +87,51 @@ body {
   transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
+/* Glass and pill utilities for cohesive neon/glassmorphism theme */
+.glass-card {
+  background-color: rgba(255,255,255,0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.glass-card-dark {
+  background-color: rgba(17,24,39,0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.pill-btn {
+  border-radius: 9999px;
+  padding: 0.5rem 0.9rem;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+}
+
+.pill-primary { background: linear-gradient(90deg, #2563eb, #4f46e5); }
+.pill-success { background: linear-gradient(90deg, #059669, #10b981); }
+.pill-warn { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.pill-danger { background: linear-gradient(90deg, #ef4444, #dc2626); }
+.pill-neutral { background: linear-gradient(90deg, #374151, #111827); }
+
+.pill-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.pill-btn:active { transform: translateY(0); }
+
+.input-glass {
+  background-color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+}
+
+html.dark .input-glass {
+  background-color: rgba(17,24,39,0.6);
+  border-color: rgba(255,255,255,0.08);
+  color: var(--text);
+}
+

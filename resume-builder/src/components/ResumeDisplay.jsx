@@ -151,19 +151,17 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onS
         <div style={styles.container}>
             {!isFormView && (
                 <div style={styles.navigation}>
-                    {/* Clear CTA-style Home button */}
                     <button
                       onClick={onGoHome}
-                      className="px-4 py-2 rounded-lg bg-gray-700 text-white shadow hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                      className="pill-btn pill-neutral"
                     >
                       Home
                     </button>
-                    {/* Render PDF download as a styled button with loading state */}
                     <PDFDownloadLink document={<ResumeDocument formData={formData} />} fileName={`${(resumeName || 'resume')}.pdf`}>
                         {({ loading }) => (
                           <button
                             disabled={loading}
-                            className={`px-4 py-2 rounded-lg text-white shadow focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 ${loading ? 'bg-emerald-400 cursor-wait' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                            className={`pill-btn ${loading ? 'bg-gray-400 cursor-wait' : 'pill-success'}`}
                           >
                             {loading ? 'Preparing PDF…' : 'Download PDF'}
                           </button>

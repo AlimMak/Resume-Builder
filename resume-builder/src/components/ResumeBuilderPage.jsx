@@ -170,22 +170,32 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
       {/* Left Column: Forms */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
         {/* Builder toolbar */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur px-4 py-3 ring-1 ring-black/5 shadow">
           <div className="text-lg font-semibold">{resumeName || 'Untitled Resume'}</div>
           <div className="flex gap-2">
-            <button onClick={handleSave} className="px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Save</button>
-            <button onClick={handleSaveAs} className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save As</button>
-            <button onClick={handleRename} className="px-3 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Rename</button>
-            <button onClick={() => { if (!dirty || confirm('Discard unsaved changes and leave?')) onGoManage?.(); }} className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-800">Manage</button>
-            <button onClick={() => { if (!dirty || confirm('Discard unsaved changes and leave?')) onGoHome?.(); }} className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700">Home</button>
+            <button onClick={handleSave} className="pill-btn pill-success">Save</button>
+            <button onClick={handleSaveAs} className="pill-btn pill-primary">Save As</button>
+            <button onClick={handleRename} className="pill-btn pill-warn">Rename</button>
+            <button onClick={() => { if (!dirty || confirm('Discard unsaved changes and leave?')) onGoManage?.(); }} className="pill-btn pill-neutral">Manage</button>
+            <button onClick={() => { if (!dirty || confirm('Discard unsaved changes and leave?')) onGoHome?.(); }} className="pill-btn pill-neutral">Home</button>
           </div>
         </div>
         {/* Render individual forms here */}
-        <PersonalInfoForm ref={personalInfoRef} initialData={formData.personalInfo} onSubmit={handlePersonalInfoUpdate} />
-        <EducationForm ref={educationRef} initialData={formData.education} onSubmit={handleEducationUpdate} />
-        <ExperienceSection ref={experienceRef} initialData={formData.experience} onSubmit={handleExperienceUpdate} />
-        <ProjectsForm ref={projectsRef} initialData={formData.projects} onSubmit={handleProjectsUpdate} />
-        <SkillsForm ref={skillsRef} initialData={formData.skills} onSubmit={handleSkillsUpdate} />
+        <div className="glass-card-dark p-4 mb-4">
+          <PersonalInfoForm ref={personalInfoRef} initialData={formData.personalInfo} onSubmit={handlePersonalInfoUpdate} />
+        </div>
+        <div className="glass-card-dark p-4 mb-4">
+          <EducationForm ref={educationRef} initialData={formData.education} onSubmit={handleEducationUpdate} />
+        </div>
+        <div className="glass-card-dark p-4 mb-4">
+          <ExperienceSection ref={experienceRef} initialData={formData.experience} onSubmit={handleExperienceUpdate} />
+        </div>
+        <div className="glass-card-dark p-4 mb-4">
+          <ProjectsForm ref={projectsRef} initialData={formData.projects} onSubmit={handleProjectsUpdate} />
+        </div>
+        <div className="glass-card-dark p-4 mb-4">
+          <SkillsForm ref={skillsRef} initialData={formData.skills} onSubmit={handleSkillsUpdate} />
+        </div>
       </div>
 
       {/* Right Column: Preview */}

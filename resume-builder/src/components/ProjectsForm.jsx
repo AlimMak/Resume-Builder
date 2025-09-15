@@ -154,7 +154,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             onChange={(e) => handleProjectChange(entry.id, 'projectName', e.target.value)}
                             placeholder="Enter project name"
                             required
-                            className="w-full p-2 border rounded"
+                            className="w-full input-glass"
                         />
                     </div>
 
@@ -167,7 +167,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             onChange={(e) => handleProjectChange(entry.id, 'role', e.target.value)}
                             placeholder="Enter your role in the project"
                             required
-                            className="w-full p-2 border rounded"
+                            className="w-full input-glass"
                         />
                     </div>
 
@@ -181,14 +181,14 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                                     value={bulletPoint}
                                     onChange={(e) => handleBulletPointChange(entry.id, bulletIndex, e.target.value)}
                                     placeholder="Enter a bullet point"
-                                    className="flex-1 p-2 border rounded"
+                                    className="flex-1 input-glass"
                                     maxLength={300}
                                 />
                                 {entry.bulletPoints.length > 1 && (
                                     <button
                                         type="button"
                                         onClick={() => removeBulletPoint(entry.id, bulletIndex)}
-                                        className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                        className="pill-btn pill-danger"
                                     >
                                         Remove
                                     </button>
@@ -198,7 +198,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                         <button
                             type="button"
                             onClick={() => addBulletPoint(entry.id)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            className="pill-btn pill-primary"
                         >
                             Add Bullet Point
                         </button>
@@ -213,7 +213,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             onChange={(e) => handleProjectChange(entry.id, 'location', e.target.value)}
                             placeholder="Enter project location"
                             required
-                            className="w-full p-2 border rounded"
+                            className="w-full input-glass"
                         />
                     </div>
 
@@ -225,7 +225,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             value={entry.startDate}
                             onChange={(e) => handleProjectChange(entry.id, 'startDate', e.target.value)}
                             required
-                            className="w-full p-2 border rounded"
+                            className="w-full input-glass"
                         />
                     </div>
 
@@ -250,7 +250,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                                 onChange={(e) => handleProjectChange(entry.id, 'endDate', e.target.value)}
                                 min={entry.startDate}
                                 required
-                                className="w-full p-2 border rounded"
+                                className="w-full input-glass"
                             />
                         </div>
                     )}
@@ -260,7 +260,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                         <button 
                             type="button" 
                             onClick={() => removeProjectEntry(entry.id)}
-                            className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                            className="w-full pill-btn pill-danger"
                         >
                             Remove Project
                         </button>
@@ -272,7 +272,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             <button 
                 type="button" 
                 onClick={addProjectEntry}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hover-glow-primary transition-base"
+                className="pill-btn pill-primary"
             >
                 Add Another Project
             </button>
@@ -280,7 +280,7 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             {/* Save Button */}
             <button 
                 type="submit"
-                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 hover-glow-emerald transition-base"
+                className="w-full pill-btn pill-success"
             >
                 Save Projects
             </button>

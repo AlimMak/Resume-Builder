@@ -91,13 +91,13 @@ const SkillsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     value={currentSkill}
                     onChange={handleCurrentSkillChange}
                     placeholder="Enter a skill"
-                    className="flex-1 p-2 border rounded"
+                    className="flex-1 input-glass"
                 />
                 <button 
                     type="button" 
                     onClick={addSkillEntry}
                     disabled={!currentSkill.trim()}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hover-glow-primary transition-base disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="pill-btn pill-primary disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                     Add Skill
                 </button>
@@ -113,12 +113,12 @@ const SkillsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                             value={skill}
                             onChange={(e) => handleExistingSkillChange(index, e.target.value)}
                             placeholder="Enter a skill"
-                            className="flex-1 p-2 border rounded"
+                            className="flex-1 input-glass"
                         />
                         <button 
                             type="button" 
                             onClick={() => removeSkillEntry(index)}
-                            className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 hover-elevate transition-base"
+                            className="pill-btn pill-danger"
                         >
                             Remove
                         </button>
@@ -129,7 +129,7 @@ const SkillsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             {/* Save Button */}
             <button 
                 type="submit"
-                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 hover-glow-emerald transition-base"
+                className="w-full pill-btn pill-success"
             >
                 Save Skills
             </button>
