@@ -22,7 +22,7 @@ import { logger as rootLogger } from './logger';
 const logger = rootLogger.child('resumeDb');
 
 const DB_NAME = 'resumeBuilderDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // v2 adds resumeMeta store for per-resume dismissals/prefs
 const STORE_NAME = 'resumes';
 
 /**
@@ -41,6 +41,10 @@ function openDb() {
           // Non-unique name index to allow searching; uniqueness handled in app logic
           store.createIndex('name', 'name', { unique: false });
           store.createIndex('updatedAt', 'updatedAt', { unique: false });
+        }
+        // Meta store for dismissals and panel prefs per resume
+        if (!db.objectStoreNames.contains('resumeMeta')) {
+          db.createObjectStore('resumeMeta', { keyPath: 'resumeId' });
         }
         logger.info('DB upgrade complete', { oldVersion: event.oldVersion, newVersion: DB_VERSION });
       };
@@ -249,6 +253,33 @@ export async function hasAnyResumes() {
   return all.length > 0;
 }
 
+/**
+ * Resume Meta helpers: store dismissals and UI prefs per resume
+ */
+export async function getResumeMeta(resumeId) {
+  if (!resumeId) return null;
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('resumeMeta', 'readonly');
+    const store = tx.objectStore('resumeMeta');
+    const req = store.get(resumeId);
+    req.onsuccess = () => resolve(req.result || { resumeId, dismissed: {}, panelOpen: false });
+    req.onerror = () => reject(req.error);
+  });
+}
+
+export async function setResumeMeta(resumeId, meta) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('resumeMeta', 'readwrite');
+    const store = tx.objectStore('resumeMeta');
+    const record = { resumeId, ...(meta || {}) };
+    const req = store.put(record);
+    req.onsuccess = () => resolve(record);
+    req.onerror = () => reject(req.error);
+  });
+}
+
 export default {
   listResumes,
   getResume,
@@ -260,6 +291,8 @@ export default {
   findUniqueName,
   hasAnyResumes,
   createEmptyFormData,
+  getResumeMeta,
+  setResumeMeta,
 };
 
 

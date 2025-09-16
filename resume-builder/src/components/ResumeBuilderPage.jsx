@@ -5,9 +5,11 @@ import EducationForm from './EducationForm';
 import ExperienceSection from './ExperienceSection';
 import ProjectsForm from './ProjectsForm';
 import SkillsForm from './SkillsForm';
-import { createEmptyFormData, createResume, getResume, renameResume, updateResume } from '../utils/resumeDb';
+import { createEmptyFormData, createResume, getResume, renameResume, updateResume, getResumeMeta, setResumeMeta } from '../utils/resumeDb';
 import { logger } from '../utils/logger';
 import { useToast } from './ToastProvider';
+import { evaluateResume, applyAutoFix } from '../utils/qualityRules';
+import QualityPanel from './QualityPanel';
 
 function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) {
   // Keep track of the currently hovered section for highlighting
@@ -20,6 +22,11 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
   const [dirty, setDirty] = useState(false);
   const hydratingRef = useRef(false);
   const toast = useToast();
+  const [issues, setIssues] = useState([]);
+  const [filters, setFilters] = useState({ error: true, warn: true, info: true });
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [meta, setMeta] = useState({ dismissed: {}, panelOpen: false });
 
   // Load current resume by id
   useEffect(() => {
@@ -34,6 +41,13 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
           setResumeName(rec.name || '');
           setDirty(false);
           logger.info('Loaded resume into builder', { id: rec.id, name: rec.name });
+          try {
+            const m = await getResumeMeta(rec.id);
+            setMeta(m || { dismissed: {}, panelOpen: false });
+            setPanelOpen(!!m?.panelOpen);
+          } catch (e) {
+            logger.warn('Failed to load resume meta', { message: e?.message });
+          }
         }
       } catch (err) {
         logger.error('Failed to load resume', { message: err?.message });
@@ -63,6 +77,25 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   }, [dirty]);
+
+  // Debounced evaluation of issues, filtered by dismissed meta
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        const result = evaluateResume(formData);
+        const filtered = result.filter(it => !meta?.dismissed?.[it.id]);
+        setIssues(filtered);
+        logger.info('Quality evaluated', {
+          errors: filtered.filter(i => i.severity === 'error').length,
+          warns: filtered.filter(i => i.severity === 'warn').length,
+          info: filtered.filter(i => i.severity === 'info').length,
+        });
+      } catch (e) {
+        logger.error('Evaluate failed', { message: e?.message });
+      }
+    }, 400);
+    return () => clearTimeout(id);
+  }, [formData, meta]);
 
   // Toolbar actions: Save, Save As (duplicate), Rename handled via App-level navigation for Save As; here implement Save and Rename
   const handleSave = async () => {
@@ -176,6 +209,17 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
             <button onClick={handleSave} className="pill-btn pill-success">Save</button>
             <button onClick={handleSaveAs} className="pill-btn pill-primary">Save As</button>
             <button onClick={handleRename} className="pill-btn pill-warn">Rename</button>
+            <button onClick={async () => {
+              const next = !panelOpen;
+              setPanelOpen(next);
+              try {
+                if (loadedId) {
+                  const newMeta = { ...(meta || {}), resumeId: loadedId, panelOpen: next };
+                  await setResumeMeta(loadedId, newMeta);
+                  setMeta(newMeta);
+                }
+              } catch (e) { logger.warn('Failed to persist panelOpen', { message: e?.message }); }
+            }} className="pill-btn pill-neutral">Quality {issues.length ? `(${issues.filter(i=>i.severity!=='info').length})` : ''}</button>
             <button onClick={() => { if (!dirty || confirm('Discard unsaved changes and leave?')) onGoManage?.(); }} className="pill-btn pill-neutral">Manage</button>
             <button onClick={() => { if (!dirty || confirm('Discard unsaved changes and leave?')) onGoHome?.(); }} className="pill-btn pill-neutral">Home</button>
           </div>
@@ -209,6 +253,41 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
            hoveredSection={hoveredSection} // Pass hovered section state for highlighting
            resumeName={resumeName}
         />
+        {panelOpen && (
+          <div className="mt-4">
+            <QualityPanel
+              issues={issues}
+              onJump={(section) => handleSectionClick(section)}
+              onDismiss={async (id) => {
+                setBusy(true);
+                try {
+                  const dismissed = { ...((meta && meta.dismissed) || {}), [id]: true };
+                  if (loadedId) await setResumeMeta(loadedId, { ...(meta||{}), resumeId: loadedId, dismissed });
+                  setMeta(prev => ({ ...(prev||{}), dismissed }));
+                  setIssues(prev => prev.filter(it => it.id !== id));
+                } finally { setBusy(false); }
+              }}
+              onAutoFix={async (issue) => {
+                setBusy(true);
+                try {
+                  const next = applyAutoFix(formData, issue.autoFix);
+                  setFormData(next);
+                  toast.success('Applied auto-fix');
+                } finally { setBusy(false); }
+              }}
+              filters={filters}
+              setFilters={setFilters}
+              onRestore={async () => {
+                setBusy(true);
+                try {
+                  if (loadedId) await setResumeMeta(loadedId, { ...(meta||{}), resumeId: loadedId, dismissed: {} });
+                  setMeta(prev => ({ ...(prev||{}), dismissed: {} }));
+                } finally { setBusy(false); }
+              }}
+              busy={busy}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
