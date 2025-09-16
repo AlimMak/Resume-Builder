@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import ExperienceForm from './ExperienceForm';
 import { useToast } from './ToastProvider';
 import { logger } from '../utils/logger';
@@ -35,6 +35,11 @@ const ExperienceSection = React.forwardRef(({ initialData, onSubmit }, ref) => {
       setExperiences(initialData);
     }
   }, [initialData, setExperiences]);
+
+  // Expose current experiences to parent
+  useImperativeHandle(ref, () => ({
+    getData: () => experiences
+  }), [experiences]);
 
   // Updates a specific experience when its form changes
   const handleExperienceChange = (id, updatedExperience) => {
@@ -121,7 +126,7 @@ const ExperienceSection = React.forwardRef(({ initialData, onSubmit }, ref) => {
       <button 
         type="button" 
         onClick={addNewExperience}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hover-glow-primary transition-base"
+        className="pill-btn pill-primary"
       >
         Add Another Experience
       </button>
@@ -129,7 +134,7 @@ const ExperienceSection = React.forwardRef(({ initialData, onSubmit }, ref) => {
       {/* Save Button */}
       <button 
         type="submit"
-        className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 hover-glow-emerald transition-base"
+        className="w-full pill-btn pill-success"
       >
         Save Work Experience
       </button>

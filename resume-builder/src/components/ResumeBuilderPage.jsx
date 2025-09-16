@@ -101,7 +101,9 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
   const handleSave = async () => {
     try {
       if (!loadedId) return;
-      await updateResume(loadedId, { data: formData });
+      const current = gatherAllFormData();
+      await updateResume(loadedId, { data: current });
+      setFormData(current);
       setDirty(false);
       toast.success('Saved changes', { id: loadedId });
     } catch (err) {
@@ -196,6 +198,16 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
   const experienceRef = useRef(null);
   const projectsRef = useRef(null);
   const skillsRef = useRef(null);
+
+  // Collect latest values from all sections (even if section save buttons weren't pressed)
+  function gatherAllFormData() {
+    const personalInfo = personalInfoRef.current && personalInfoRef.current.getData ? personalInfoRef.current.getData() : formData.personalInfo;
+    const education = educationRef.current && educationRef.current.getData ? educationRef.current.getData() : formData.education;
+    const experience = experienceRef.current && experienceRef.current.getData ? experienceRef.current.getData() : formData.experience;
+    const projects = projectsRef.current && projectsRef.current.getData ? projectsRef.current.getData() : formData.projects;
+    const skills = skillsRef.current && skillsRef.current.getData ? skillsRef.current.getData() : formData.skills;
+    return { personalInfo, education, experience, projects, skills };
+  }
 
   // Always render the builder UI
   return (

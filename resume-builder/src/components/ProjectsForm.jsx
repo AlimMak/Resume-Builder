@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
 import { useToast } from './ToastProvider';
 import { logger } from '../utils/logger';
 
@@ -23,18 +23,14 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
         if (initialData && initialData.length > 0) {
             setProjectEntries(initialData);
         } else {
-            setProjectEntries([{
-                id: '1',
-                projectName: '',
-                role: '',
-                bulletPoints: [''],
-                location: '',
-                startDate: '',
-                endDate: '',
-                isCurrent: false
-            }]);
+            setProjectEntries([{ id: '1', projectName: '', role: '', bulletPoints: [''], location: '', startDate: '', endDate: '', isCurrent: false }]);
         }
     }, [initialData]);
+
+    // Expose current projects to parent for global Save
+    useImperativeHandle(ref, () => ({
+        getData: () => projectEntries
+    }), [projectEntries]);
 
     // Function to handle changes in any project entry
     const handleProjectChange = (id, field, value) => {
@@ -140,7 +136,6 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
     return (
         <form onSubmit={handleSave} ref={ref} className="space-y-4">
             <h2 className="text-2xl font-bold mb-4">Projects</h2>
-            
             {/* Map through all project entries */}
             {projectEntries.map((entry, index) => (
                 <div key={entry.id} className="space-y-4 p-4 border rounded" draggable onDragStart={onDragStart(index)} onDragOver={onDragOver} onDrop={onDrop(index)}>
@@ -148,142 +143,58 @@ const ProjectsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
                     {/* Project Name Input */}
                     <div className="space-y-2">
                         <label className="block font-medium">Project Name:</label>
-                        <input
-                            type="text"
-                            value={entry.projectName}
-                            onChange={(e) => handleProjectChange(entry.id, 'projectName', e.target.value)}
-                            placeholder="Enter project name"
-                            required
-                            className="w-full input-glass"
-                        />
+                        <input type="text" value={entry.projectName} onChange={(e) => handleProjectChange(entry.id, 'projectName', e.target.value)} placeholder="Enter project name" required className="w-full input-glass" />
                     </div>
-
                     {/* Role Input */}
                     <div className="space-y-2">
                         <label className="block font-medium">Your Role:</label>
-                        <input
-                            type="text"
-                            value={entry.role}
-                            onChange={(e) => handleProjectChange(entry.id, 'role', e.target.value)}
-                            placeholder="Enter your role in the project"
-                            required
-                            className="w-full input-glass"
-                        />
+                        <input type="text" value={entry.role} onChange={(e) => handleProjectChange(entry.id, 'role', e.target.value)} placeholder="Enter your role in the project" required className="w-full input-glass" />
                     </div>
-
                     {/* Project Bullet Points */}
                     <div className="space-y-2">
                         <label className="block font-medium">Project Details & Achievements:</label>
                         {entry.bulletPoints.map((bulletPoint, bulletIndex) => (
                             <div key={bulletIndex} className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={bulletPoint}
-                                    onChange={(e) => handleBulletPointChange(entry.id, bulletIndex, e.target.value)}
-                                    placeholder="Enter a bullet point"
-                                    className="flex-1 input-glass"
-                                    maxLength={300}
-                                />
+                                <input type="text" value={bulletPoint} onChange={(e) => handleBulletPointChange(entry.id, bulletIndex, e.target.value)} placeholder="Enter a bullet point" className="flex-1 input-glass" maxLength={300} />
                                 {entry.bulletPoints.length > 1 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => removeBulletPoint(entry.id, bulletIndex)}
-                                        className="pill-btn pill-danger"
-                                    >
-                                        Remove
-                                    </button>
+                                    <button type="button" onClick={() => removeBulletPoint(entry.id, bulletIndex)} className="pill-btn pill-danger">Remove</button>
                                 )}
                             </div>
                         ))}
-                        <button
-                            type="button"
-                            onClick={() => addBulletPoint(entry.id)}
-                            className="pill-btn pill-primary"
-                        >
-                            Add Bullet Point
-                        </button>
+                        <button type="button" onClick={() => addBulletPoint(entry.id)} className="pill-btn pill-primary">Add Bullet Point</button>
                     </div>
-
                     {/* Location Input */}
                     <div className="space-y-2">
                         <label className="block font-medium">Location:</label>
-                        <input
-                            type="text"
-                            value={entry.location}
-                            onChange={(e) => handleProjectChange(entry.id, 'location', e.target.value)}
-                            placeholder="Enter project location"
-                            required
-                            className="w-full input-glass"
-                        />
+                        <input type="text" value={entry.location} onChange={(e) => handleProjectChange(entry.id, 'location', e.target.value)} placeholder="Enter project location" required className="w-full input-glass" />
                     </div>
-
                     {/* Start Date Input */}
                     <div className="space-y-2">
                         <label className="block font-medium">Start Date:</label>
-                        <input
-                            type="month"
-                            value={entry.startDate}
-                            onChange={(e) => handleProjectChange(entry.id, 'startDate', e.target.value)}
-                            required
-                            className="w-full input-glass"
-                        />
+                        <input type="month" value={entry.startDate} onChange={(e) => handleProjectChange(entry.id, 'startDate', e.target.value)} required className="w-full input-glass" />
                     </div>
-
                     {/* Current Project Checkbox */}
                     <div className="flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            checked={entry.isCurrent}
-                            onChange={(e) => handleProjectChange(entry.id, 'isCurrent', e.target.checked)}
-                            className="h-4 w-4"
-                        />
+                        <input type="checkbox" checked={entry.isCurrent} onChange={(e) => handleProjectChange(entry.id, 'isCurrent', e.target.checked)} className="h-4 w-4" />
                         <label>Currently working on this project</label>
                     </div>
-
                     {/* End Date Input (only show if not current project) */}
                     {!entry.isCurrent && (
                         <div className="space-y-2">
                             <label className="block font-medium">End Date:</label>
-                            <input
-                                type="month"
-                                value={entry.endDate}
-                                onChange={(e) => handleProjectChange(entry.id, 'endDate', e.target.value)}
-                                min={entry.startDate}
-                                required
-                                className="w-full input-glass"
-                            />
+                            <input type="month" value={entry.endDate} onChange={(e) => handleProjectChange(entry.id, 'endDate', e.target.value)} min={entry.startDate} required className="w-full input-glass" />
                         </div>
                     )}
-
                     {/* Remove Button (only show if more than one entry) */}
                     {projectEntries.length > 1 && (
-                        <button 
-                            type="button" 
-                            onClick={() => removeProjectEntry(entry.id)}
-                            className="w-full pill-btn pill-danger"
-                        >
-                            Remove Project
-                        </button>
+                        <button type="button" onClick={() => removeProjectEntry(entry.id)} className="w-full pill-btn pill-danger">Remove Project</button>
                     )}
                 </div>
             ))}
-
             {/* Add New Project Entry Button */}
-            <button 
-                type="button" 
-                onClick={addProjectEntry}
-                className="pill-btn pill-primary"
-            >
-                Add Another Project
-            </button>
-
+            <button type="button" onClick={addProjectEntry} className="pill-btn pill-primary">Add Another Project</button>
             {/* Save Button */}
-            <button 
-                type="submit"
-                className="w-full pill-btn pill-success"
-            >
-                Save Projects
-            </button>
+            <button type="submit" className="w-full pill-btn pill-success">Save Projects</button>
         </form>
     );
 });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle } from 'react';
 import { useToast } from './ToastProvider';
 import { logger } from '../utils/logger';
 
@@ -23,6 +23,11 @@ const EducationForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             setEducationEntries(initialData);
         }
     }, [initialData]);
+
+    // Expose current entries to parent for global Save
+    useImperativeHandle(ref, () => ({
+        getData: () => educationEntries
+    }), [educationEntries]);
 
     // Function to handle changes in any education entry
     const handleEducationChange = (id, field, value) => {

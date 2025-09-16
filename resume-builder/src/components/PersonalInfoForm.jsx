@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useImperativeHandle } from "react";
 import { useToast } from './ToastProvider';
 import { logger } from '../utils/logger';
 
@@ -51,6 +51,15 @@ const PersonalInfoForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
              }));
         }
     }, [initialData]);
+
+    // Expose current data to parent so the global Save can persist unsaved edits
+    useImperativeHandle(ref, () => ({
+        /**
+         * getData
+         * Returns the current in-form inputs without requiring the local save button.
+         */
+        getData: () => inputs
+    }), [inputs]);
 
     const validateInputs = () => {
         let isValid = true;

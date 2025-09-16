@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useImperativeHandle } from 'react';
 import { useToast } from './ToastProvider';
 import { logger } from '../utils/logger';
 
@@ -17,6 +17,11 @@ const SkillsForm = React.forwardRef(({ initialData, onSubmit }, ref) => {
             setSkills([]); // Default to empty array if initialData is not valid
         }
     }, [initialData]);
+
+    // Expose current skills to parent for global Save
+    useImperativeHandle(ref, () => ({
+        getData: () => skills
+    }), [skills]);
 
     // Function to handle changes in an existing skill entry
     const handleExistingSkillChange = (index, value) => {
