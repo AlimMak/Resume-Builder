@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ResumeDocument from './ResumeDocument';
 
@@ -34,106 +34,75 @@ export function debounce(func, delay) {
   };
 }
 
-// Styles object for the preview - Ensuring correct React inline style format
-const styles = {
-  container: {
-    // Constrain width to printable size and center content
-    maxWidth: '8.5in',
-    margin: '0 auto',
-    padding: '24px',
-    fontFamily: 'Times New Roman, Times, serif',
-    backgroundColor: 'transparent',
-  },
-  navigation: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '16px',
-  },
-  personalInfoContainer: {
-    textAlign: 'center',
-    marginBottom: '6px',
-  },
-  nameHeading: {
-    fontSize: '18pt',
-    fontWeight: 'bold',
-    marginBottom: '4px',
-  },
-  inlineText: {
-    fontSize: '10.5pt',
-    marginBottom: '4px',
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '5px',
-  },
-  inlineTextItem: {
-    marginRight: '5px',
-  },
-  socialLinksContainer: {
-    marginTop: '3px',
-    marginBottom: '10px',
-    textAlign: 'center',
-  },
-  section: {
-    marginBottom: '10px',
-  },
-  heading: {
-    fontSize: '12pt',
-    fontWeight: 'bold',
-    marginBottom: '4px',
-    borderBottom: '1px solid #000',
-    paddingBottom: '1px',
-  },
-  subheading: {
-    fontSize: '10.5pt',
-    fontWeight: 'bold',
-    marginBottom: '2px',
-  },
-  text: {
-    fontSize: '10.5pt',
-    lineHeight: 1.35,
-    marginBottom: '2px',
-  },
-  bulletPoint: {
-    fontSize: '10.5pt',
-    lineHeight: 1.35,
-    marginBottom: '2px',
-    marginLeft: '12px',
-  },
-  row: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '2px',
-  },
-  leftColumn: {
-    flex: 1,
-  },
-  rightColumn: {
-    textAlign: 'right',
-  },
-  italic: {
-    fontStyle: 'italic',
-  },
-  bold: {
-    fontWeight: 'bold',
-  },
-  pagePreview: {
-    // Ensure the resume surface is always high-contrast and readable in dark mode
-    border: '1px solid #e5e7eb', // Light border
-    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)', // Subtle shadow
-    padding: '28px', // Comfortable internal padding
-    backgroundColor: '#ffffff', // Paper white
-    color: '#0b0f19', // Stronger dark text for light mode
-    borderRadius: '8px',
-  },
-  highlightedSection: {
-    backgroundColor: '#f0f0f0', // Light grey background for highlighting
-    cursor: 'pointer', // Indicate that the section is clickable
-  },
-};
+// Generate styles based on compact level
+function getStyles(compactLevel) {
+  const scale = compactLevel === 'ultra' ? 0.9 : compactLevel === 'tight' ? 0.95 : 1;
+  const base = 10.5 * scale;
+  const lh = 1.35 - (compactLevel === 'ultra' ? 0.13 : compactLevel === 'tight' ? 0.07 : 0);
+  const sectionGap = 10 - (compactLevel === 'ultra' ? 4 : compactLevel === 'tight' ? 2 : 0);
+  return {
+    container: {
+      maxWidth: '8.5in',
+      margin: '0 auto',
+      padding: '24px',
+      fontFamily: 'Times New Roman, Times, serif',
+      backgroundColor: 'transparent',
+    },
+    navigation: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginBottom: '16px',
+    },
+    personalInfoContainer: {
+      textAlign: 'center',
+      marginBottom: '6px',
+    },
+    nameHeading: {
+      fontSize: `${18 * scale}pt`,
+      fontWeight: 'bold',
+      marginBottom: '4px',
+    },
+    inlineText: {
+      fontSize: `${base}pt`,
+      marginBottom: '4px',
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '5px',
+    },
+    inlineTextItem: { marginRight: '5px' },
+    socialLinksContainer: { marginTop: '3px', marginBottom: '10px', textAlign: 'center' },
+    section: { marginBottom: `${sectionGap}px` },
+    heading: {
+      fontSize: `${12 * scale}pt`,
+      fontWeight: 'bold',
+      marginBottom: '4px',
+      borderBottom: '1px solid #000',
+      paddingBottom: '1px',
+    },
+    subheading: { fontSize: `${base}pt`, fontWeight: 'bold', marginBottom: '2px' },
+    text: { fontSize: `${base}pt`, lineHeight: lh, marginBottom: '2px' },
+    bulletPoint: { fontSize: `${base}pt`, lineHeight: lh, marginBottom: '2px', marginLeft: '12px' },
+    row: { display: 'flex', justifyContent: 'space-between', marginBottom: '2px' },
+    leftColumn: { flex: 1 },
+    rightColumn: { textAlign: 'right' },
+    italic: { fontStyle: 'italic' },
+    bold: { fontWeight: 'bold' },
+    pagePreview: {
+      border: '1px solid #e5e7eb',
+      boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)',
+      padding: '28px',
+      backgroundColor: '#ffffff',
+      color: '#0b0f19',
+      borderRadius: '8px',
+    },
+    highlightedSection: { backgroundColor: '#f0f0f0', cursor: 'pointer' },
+  };
+}
 
-function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onSectionClick, onSectionHover, hoveredSection, resumeName }) {
+function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onSectionClick, onSectionHover, hoveredSection, resumeName, hiddenSections = {}, compactLevel = 'default' }) {
     const socials = formData?.personalInfo?.socials || [];
     const targetRef = useRef();
+    const styles = useMemo(() => getStyles(compactLevel), [compactLevel]);
 
     // Add a check for empty formData
     if (!formData || !formData.personalInfo) {
@@ -147,8 +116,9 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onS
         );
     }
 
+    const compactClass = compactLevel === 'ultra' ? 'compact-ultra' : compactLevel === 'tight' ? 'compact-tight' : '';
     return (
-        <div style={styles.container}>
+        <div style={styles.container} className={compactClass}>
             {!isFormView && (
                 <div style={styles.navigation}>
                     <button
@@ -157,7 +127,7 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onS
                     >
                       Home
                     </button>
-                    <PDFDownloadLink document={<ResumeDocument formData={formData} />} fileName={`${(resumeName || 'resume')}.pdf`}>
+                    <PDFDownloadLink document={<ResumeDocument formData={formData} hiddenSections={hiddenSections} compactLevel={compactLevel} />} fileName={`${(resumeName || 'resume')}.pdf`}>
                         {({ loading }) => (
                           <button
                             disabled={loading}
@@ -214,7 +184,7 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onS
                 </div>
 
                 {/* Education Section */}
-                {formData.education && formData.education.length > 0 && (
+                {!hiddenSections.education && formData.education && formData.education.length > 0 && (
                     <div 
                       style={hoveredSection === 'education' ? {...styles.section, ...styles.highlightedSection} : styles.section}
                       onClick={() => onSectionClick('education')}
@@ -248,7 +218,7 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onS
                 )}
 
                 {/* Skills Section */}
-                {Array.isArray(formData.skills) && formData.skills.length > 0 && (
+                {!hiddenSections.skills && Array.isArray(formData.skills) && formData.skills.length > 0 && (
                     <div 
                       style={hoveredSection === 'skills' ? {...styles.section, ...styles.highlightedSection} : styles.section}
                       onClick={() => onSectionClick('skills')}
@@ -267,7 +237,7 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onS
                 )}
 
                 {/* Experience Section */}
-                {formData.experience && formData.experience.length > 0 && (
+                {!hiddenSections.experience && formData.experience && formData.experience.length > 0 && (
                     <div 
                       style={hoveredSection === 'experience' ? {...styles.section, ...styles.highlightedSection} : styles.section}
                       onClick={() => onSectionClick('experience')}
@@ -304,7 +274,7 @@ function ResumeDisplay({ formData, onBack, isFormView, onBackStep, onGoHome, onS
                 )}
 
                 {/* Projects Section */}
-                {formData.projects && formData.projects.length > 0 && (
+                {!hiddenSections.projects && formData.projects && formData.projects.length > 0 && (
                     <div 
                       style={hoveredSection === 'projects' ? {...styles.section, ...styles.highlightedSection} : styles.section}
                       onClick={() => onSectionClick('projects')}

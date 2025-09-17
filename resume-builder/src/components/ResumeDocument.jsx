@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const ResumeDocument = ({ formData }) => (
+const ResumeDocument = ({ formData, hiddenSections = {}, compactLevel = 'default' }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.personalInfoContainer}>
@@ -151,7 +151,7 @@ const ResumeDocument = ({ formData }) => (
       </View>
 
 
-      {formData.education && formData.education.length > 0 && (
+      {!hiddenSections.education && formData.education && formData.education.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.heading}>EDUCATION</Text>
           {formData.education.map((edu, index) => (
@@ -171,7 +171,7 @@ const ResumeDocument = ({ formData }) => (
         </View>
       )}
 
-      {formData.skills && formData.skills.length > 0 && (
+      {!hiddenSections.skills && formData.skills && formData.skills.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.heading}>SKILLS</Text>
           <Text style={styles.text}>
@@ -180,7 +180,7 @@ const ResumeDocument = ({ formData }) => (
         </View>
       )}
 
-      {formData.experience && formData.experience.length > 0 && (
+      {!hiddenSections.experience && formData.experience && formData.experience.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.heading}>EXPERIENCE</Text>
           {formData.experience.map((exp, index) => (
@@ -203,7 +203,7 @@ const ResumeDocument = ({ formData }) => (
         </View>
       )}
 
-      {formData.projects && formData.projects.length > 0 && (
+      {!hiddenSections.projects && formData.projects && formData.projects.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.heading}>PROJECTS</Text>
           {formData.projects.map((project, index) => (

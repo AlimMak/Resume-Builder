@@ -138,7 +138,8 @@ function ManageResumesPage({ onGoHome, onOpenResume }) {
                           {renamingId !== r.id && (
                             <button onClick={() => { setRenamingId(r.id); setNewName(r.name); }} className="px-3 py-2 rounded-full bg-amber-500 text-white shadow hover:shadow-xl transition-base">Rename</button>
                           )}
-                          <button onClick={() => handleDuplicate(r.id)} className="px-3 py-2 rounded-full bg-emerald-600 text-white shadow hover:shadow-xl hover-glow-emerald transition-base">Save As</button>
+                        <button onClick={() => handleDuplicate(r.id)} className="px-3 py-2 rounded-full bg-emerald-600 text-white shadow hover:shadow-xl hover-glow-emerald transition-base">Save As</button>
+                        <button onClick={() => handleDuplicate(r.id)} className="px-3 py-2 rounded-full bg-blue-600 text-white shadow hover:shadow-xl transition-base">Duplicate</button>
                           <PDFDownloadLink document={<ResumeDocument formData={r.data} />} fileName={`${(r.name || 'resume')}.pdf`}>
                             {({ loading }) => (
                               <button disabled={loading} className={`px-3 py-2 rounded-full text-white shadow transition-base ${loading ? 'bg-gray-400 cursor-wait' : 'bg-gray-700 hover:shadow-xl hover:bg-gray-800'}`}>

@@ -135,3 +135,22 @@ html.dark .input-glass {
   color: var(--text);
 }
 
+/* Compact levels for preview/PDF alignment (tokens) */
+:root {
+  --rb-font-size: 10.5pt;
+  --rb-line-height: 1.35;
+  --rb-section-gap: 10px;
+}
+
+.compact-tight {
+  --rb-font-size: 10pt;
+  --rb-line-height: 1.28;
+  --rb-section-gap: 8px;
+}
+
+.compact-ultra {
+  --rb-font-size: 9.5pt;
+  --rb-line-height: 1.22;
+  --rb-section-gap: 6px;
+}
+

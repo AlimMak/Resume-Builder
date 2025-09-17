@@ -10,6 +10,7 @@ import { logger } from '../utils/logger';
 import { useToast } from './ToastProvider';
 import { evaluateResume, applyAutoFix } from '../utils/qualityRules';
 import QualityPanel from './QualityPanel';
+import FitPanel from './FitPanel';
 
 function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) {
   // Keep track of the currently hovered section for highlighting
@@ -27,6 +28,11 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
   const [panelOpen, setPanelOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [meta, setMeta] = useState({ dismissed: {}, panelOpen: false });
+  const [fitOpen, setFitOpen] = useState(false);
+  const [compactLevel, setCompactLevel] = useState('default');
+  const [pageFormat, setPageFormat] = useState('A4');
+  const [hiddenSections, setHiddenSections] = useState({ education: false, experience: false, projects: false, skills: false });
+  const [overflowLines, setOverflowLines] = useState(0);
 
   // Load current resume by id
   useEffect(() => {
@@ -45,6 +51,10 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
             const m = await getResumeMeta(rec.id);
             setMeta(m || { dismissed: {}, panelOpen: false });
             setPanelOpen(!!m?.panelOpen);
+            // Fit/meta defaults
+            if (m?.compactLevel) setCompactLevel(m.compactLevel);
+            if (m?.pageFormat) setPageFormat(m.pageFormat);
+            if (m?.hiddenSections) setHiddenSections(m.hiddenSections);
           } catch (e) {
             logger.warn('Failed to load resume meta', { message: e?.message });
           }
@@ -221,6 +231,7 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
             <button onClick={handleSave} className="pill-btn pill-success">Save</button>
             <button onClick={handleSaveAs} className="pill-btn pill-primary">Save As</button>
             <button onClick={handleRename} className="pill-btn pill-warn">Rename</button>
+            <button onClick={() => setFitOpen(v => !v)} className={`pill-btn ${overflowLines > 0 ? 'pill-danger' : 'pill-success'}`}>Fit {overflowLines > 0 ? `+${overflowLines}` : 'OK'}</button>
             <button onClick={async () => {
               const next = !panelOpen;
               setPanelOpen(next);
@@ -264,7 +275,39 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
            onSectionHover={handleSectionHover}
            hoveredSection={hoveredSection} // Pass hovered section state for highlighting
            resumeName={resumeName}
+           hiddenSections={hiddenSections}
+           compactLevel={compactLevel}
         />
+        {fitOpen && (
+          <div className="mt-4">
+            <FitPanel
+              compactLevel={compactLevel}
+              setCompactLevel={async (lvl) => {
+                setCompactLevel(lvl);
+                try { if (loadedId) await setResumeMeta(loadedId, { ...(meta||{}), resumeId: loadedId, compactLevel: lvl }); } catch {}
+              }}
+              pageFormat={pageFormat}
+              setPageFormat={async (fmt) => {
+                setPageFormat(fmt);
+                try { if (loadedId) await setResumeMeta(loadedId, { ...(meta||{}), resumeId: loadedId, pageFormat: fmt }); } catch {}
+              }}
+              hiddenSections={hiddenSections}
+              setHiddenSections={async (next) => {
+                setHiddenSections(typeof next === 'function' ? next(hiddenSections) : next);
+                const value = typeof next === 'function' ? next(hiddenSections) : next;
+                try { if (loadedId) await setResumeMeta(loadedId, { ...(meta||{}), resumeId: loadedId, hiddenSections: value }); } catch {}
+              }}
+              overflowLines={overflowLines}
+              onRestoreDefaults={async () => {
+                const defHidden = { education: false, experience: false, projects: false, skills: false };
+                setCompactLevel('default');
+                setPageFormat('A4');
+                setHiddenSections(defHidden);
+                try { if (loadedId) await setResumeMeta(loadedId, { ...(meta||{}), resumeId: loadedId, compactLevel: 'default', pageFormat: 'A4', hiddenSections: defHidden }); } catch {}
+              }}
+            />
+          </div>
+        )}
         {panelOpen && (
           <div className="mt-4">
             <QualityPanel
