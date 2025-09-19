@@ -7,7 +7,7 @@ import React, { useRef } from 'react';
  * Styling focuses on clear call-to-action buttons centered on the page
  * so users can immediately see where to click.
  */
-function HomePage({ onStartForm, onManageResumes }) {
+function HomePage({ onStartForm, onManageResumes, onFilterCheck }) {
     const fileInputRef = useRef(null);
     return (
         <div className="min-h-screen app-gradient">
@@ -29,6 +29,13 @@ function HomePage({ onStartForm, onManageResumes }) {
                                 className="pill-btn pill-neutral focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                             >
                                 Manage Resumes
+                            </button>
+                            <button 
+                                onClick={onFilterCheck}
+                                className="pill-btn pill-warn focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+                                title="Paste a job description to tailor your resume"
+                            >
+                                Filter Check
                             </button>
                         </div>
                     </div>

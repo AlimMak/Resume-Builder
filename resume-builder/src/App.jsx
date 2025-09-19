@@ -11,9 +11,10 @@ import ResumeBuilderPage from './components/ResumeBuilderPage'
 import { logger } from './utils/logger'
 import ManageResumesPage from './components/ManageResumesPage'
 import { createResume, getResume, hasAnyResumes } from './utils/resumeDb'
+import FilterCheckPage from './components/FilterCheckPage'
 
 function App() {
-  // Keep track of the current page: 'home' | 'manage' | 'resumeBuilder'
+  // Keep track of the current page: 'home' | 'manage' | 'resumeBuilder' | 'filterCheck'
   const [currentPage, setCurrentPage] = useState('home');
   // Track which resume is being edited in the builder
   const [currentResumeId, setCurrentResumeId] = useState(null);
@@ -65,6 +66,7 @@ function App() {
                 setCurrentPage('resumeBuilder');
               }}
               onManageResumes={() => setCurrentPage('manage')}
+              onFilterCheck={() => setCurrentPage('filterCheck')}
             />
           )}
           {currentPage === 'manage' && (
@@ -85,6 +87,12 @@ function App() {
               onGoHome={() => setCurrentPage('home')}
               onGoManage={() => setCurrentPage('manage')}
               onRenameCurrent={(name) => setCurrentResumeName(name)}
+            />
+          )}
+          {currentPage === 'filterCheck' && (
+            <FilterCheckPage 
+              onGoHome={() => setCurrentPage('home')}
+              onOpenInBuilder={(id) => { setCurrentResumeId(id); setCurrentPage('resumeBuilder'); }}
             />
           )}
         </div>

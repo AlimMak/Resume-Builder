@@ -22,7 +22,7 @@ import { logger as rootLogger } from './logger';
 const logger = rootLogger.child('resumeDb');
 
 const DB_NAME = 'resumeBuilderDB';
-const DB_VERSION = 2; // v2 adds resumeMeta store for per-resume dismissals/prefs
+const DB_VERSION = 3; // v3: extend resumeMeta for version history
 const STORE_NAME = 'resumes';
 
 /**
