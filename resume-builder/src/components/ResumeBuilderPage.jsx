@@ -6,6 +6,7 @@ import ExperienceSection from './ExperienceSection';
 import ProjectsForm from './ProjectsForm';
 import SkillsForm from './SkillsForm';
 import { createEmptyFormData, createResume, getResume, renameResume, updateResume, getResumeMeta, setResumeMeta } from '../utils/resumeDb';
+import { useDialog } from './DialogProvider';
 import { logger } from '../utils/logger';
 import { useToast } from './ToastProvider';
 import { evaluateResume, applyAutoFix } from '../utils/qualityRules';
@@ -23,6 +24,7 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
   const [dirty, setDirty] = useState(false);
   const hydratingRef = useRef(false);
   const toast = useToast();
+  const dialog = useDialog();
   const [issues, setIssues] = useState([]);
   const [filters, setFilters] = useState({ error: true, warn: true, info: true });
   const [panelOpen, setPanelOpen] = useState(false);
@@ -123,7 +125,7 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
   };
 
   const handleRename = async () => {
-    const next = prompt('Enter a new name for this resume:', resumeName || '');
+    const next = await dialog.prompt('Enter a new name for this resume:', resumeName || '', { title: 'Rename Resume' });
     if (next == null) return;
     const trimmed = next.trim();
     if (!trimmed) return;
@@ -141,7 +143,7 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
   // Save current data into a new resume record (Save As)
   const handleSaveAs = async () => {
     try {
-      const base = prompt('Enter a name for the duplicate:', resumeName || 'Untitled Resume');
+      const base = await dialog.prompt('Enter a name for the duplicate:', resumeName || 'Untitled Resume', { title: 'Save As' });
       if (base == null) return;
       const trimmed = (base || '').trim();
       if (!trimmed) return;
@@ -243,8 +245,8 @@ function ResumeBuilderPage({ onGoHome, onGoManage, resumeId, onRenameCurrent }) 
                 }
               } catch (e) { logger.warn('Failed to persist panelOpen', { message: e?.message }); }
             }} className="pill-btn pill-neutral">Quality {issues.length ? `(${issues.filter(i=>i.severity!=='info').length})` : ''}</button>
-            <button onClick={() => { if (!dirty || confirm('Discard unsaved changes and leave?')) onGoManage?.(); }} className="pill-btn pill-neutral">Manage</button>
-            <button onClick={() => { if (!dirty || confirm('Discard unsaved changes and leave?')) onGoHome?.(); }} className="pill-btn pill-neutral">Home</button>
+            <button onClick={async () => { if (!dirty || await dialog.confirm('Discard unsaved changes and leave?', { title: 'Leave page?' })) onGoManage?.(); }} className="pill-btn pill-neutral">Manage</button>
+            <button onClick={async () => { if (!dirty || await dialog.confirm('Discard unsaved changes and leave?', { title: 'Leave page?' })) onGoHome?.(); }} className="pill-btn pill-neutral">Home</button>
           </div>
         </div>
         {/* Render individual forms here */}

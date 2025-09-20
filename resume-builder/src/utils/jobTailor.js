@@ -51,6 +51,7 @@ const ALLOWLIST = [
   // Other
   'microservices','serverless','event-driven','event driven','soa','monolith','saas','paas','iaas','etl','elt','mlops','devops','site reliability','sre','apm'
 ];
+export const KEYWORD_COUNT = ALLOWLIST.length;
 const ALLOWLIST_LOWER = ALLOWLIST.map(s => s.toLowerCase());
 const ALLOW_TOKENS = new Set(ALLOWLIST_LOWER.filter(s => !s.includes(' ')));
 const ALLOW_PHRASES = ALLOWLIST_LOWER.filter(s => s.includes(' '));

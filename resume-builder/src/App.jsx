@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react'
 import ErrorBoundary from './components/ErrorBoundary'
 import { ToastProvider } from './components/ToastProvider'
+import { DialogProvider } from './components/DialogProvider'
 import ThemeToggle from './components/ThemeToggle'
 import HomePage from './components/HomePage'
 import ResumeBuilderPage from './components/ResumeBuilderPage'
@@ -48,6 +49,7 @@ function App() {
   // Show different pages based on what the user wants to see
   return (
     <ToastProvider>
+      <DialogProvider>
       <ErrorBoundary>
         <div className="app-gradient min-h-screen">
           {/* App header controls */}
@@ -97,6 +99,7 @@ function App() {
           )}
         </div>
       </ErrorBoundary>
+      </DialogProvider>
     </ToastProvider>
   );
 }
