@@ -51,7 +51,9 @@ const ALLOWLIST = [
   // Other
   'microservices','serverless','event-driven','event driven','soa','monolith','saas','paas','iaas','etl','elt','mlops','devops','site reliability','sre','apm'
 ];
-const ALLOWLIST_SET = new Set(ALLOWLIST.map(s => s.toLowerCase()));
+const ALLOWLIST_LOWER = ALLOWLIST.map(s => s.toLowerCase());
+const ALLOW_TOKENS = new Set(ALLOWLIST_LOWER.filter(s => !s.includes(' ')));
+const ALLOW_PHRASES = ALLOWLIST_LOWER.filter(s => s.includes(' '));
 
 function tokenize(text) {
   return String(text || '')
@@ -59,6 +61,21 @@ function tokenize(text) {
     .replace(/[^a-z0-9+#.\-\s]/g, ' ')
     .split(/\s+/)
     .filter(Boolean);
+}
+
+function extractAllowedFromLine(line) {
+  const hits = new Set();
+  const lower = String(line || '').toLowerCase();
+  // single-token hits
+  const toks = tokenize(lower);
+  for (const t of toks) {
+    if (ALLOW_TOKENS.has(t)) hits.add(t);
+  }
+  // phrase hits
+  for (const ph of ALLOW_PHRASES) {
+    if (lower.includes(ph)) hits.add(ph);
+  }
+  return Array.from(hits);
 }
 
 function uniquePreserveOrder(arr) {
@@ -120,9 +137,8 @@ export function extractKeywords(jdText) {
     // Prefer bullet/short lines; ignore long prose
     const bulletLike = /^([•\-\*]\s+)/.test(raw) || line.length <= 160;
     if (!bulletLike) continue;
-    // Strictly keep only allowlisted keywords to avoid generic terms
-    const tokens = tokenize(line);
-    const kept = tokens.filter(t => ALLOWLIST_SET.has(t));
+    // Strictly keep only allowlisted keywords (tokens or phrases)
+    const kept = extractAllowedFromLine(line);
     if (kept.length) buckets[current].push(...kept);
   }
 
@@ -144,8 +160,7 @@ export function extractKeywords(jdText) {
             if (!l2) continue;
             const bulletLike2 = /^([•\-\*]\s+)/.test(raw2) || l2.length <= 160;
             if (!bulletLike2) continue;
-            const tokens2 = tokenize(l2);
-            const kept2 = tokens2.filter(t => ALLOWLIST_SET.has(t));
+            const kept2 = extractAllowedFromLine(l2);
             if (kept2.length) buckets.must.push(...kept2);
           }
           if (buckets.must.length) break;
@@ -169,21 +184,19 @@ export function extractKeywords(jdText) {
       const isShort = line.length <= 140;
       const weight = isBullet ? 3 : (isShort ? 2 : 1);
 
-      // Token-based hits
-      const toks = tokenize(line);
-      for (const t of toks) {
-        if (!ALLOWLIST_SET.has(t)) continue;
-        scores.set(t, (scores.get(t) || 0) + weight);
+      // Token/phrase-based hits
+      const hits = extractAllowedFromLine(line);
+      for (const h of hits) {
+        scores.set(h, (scores.get(h) || 0) + weight);
       }
 
       // Comma-separated lists often include tools: split and test each token
       if (/,/.test(line)) {
         const parts = line.split(',').map(s => s.trim().toLowerCase());
         for (const p of parts) {
-          const toks2 = tokenize(p);
-          for (const t2 of toks2) {
-            if (!ALLOWLIST_SET.has(t2)) continue;
-            scores.set(t2, (scores.get(t2) || 0) + weight + 1);
+          const hits2 = extractAllowedFromLine(p);
+          for (const h2 of hits2) {
+            scores.set(h2, (scores.get(h2) || 0) + weight + 1);
           }
         }
       }
@@ -224,13 +237,13 @@ function enforceStyleRules(text) {
 }
 
 function matchKeywords(text, keywords) {
-  const tokens = new Set(tokenize(text));
-  const matches = [];
-  for (const k of keywords) {
-    const key = k.toLowerCase();
-    if (tokens.has(key)) matches.push(k);
+  const hits = new Set(extractAllowedFromLine(text));
+  const want = new Set((keywords || []).map(k => String(k).toLowerCase()));
+  const out = [];
+  for (const h of hits) {
+    if (want.has(h.toLowerCase())) out.push(h);
   }
-  return matches;
+  return out;
 }
 
 /**
